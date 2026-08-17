@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แดชบอร์ดติดตามงาน — คณะวิศวกรรมศาสตร์ มมส</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#182338;
+    --ink-soft:#3B4560;
+    --slate:#6B7284;
+    --paper:#F4F3EE;
+    --card:#FFFFFF;
+    --line:#E4E1D6;
+    --line-soft:#EDEBE1;
+    --teal:#2E7A63;
+    --teal-bg:#E7F2ED;
+    --amber:#B4832A;
+    --amber-bg:#FBF1DE;
+    --burgundy:#93334A;
+    --burgundy-bg:#F7E9EC;
+    --navy-tag:#1F3A5F;
+    --dept-a:#1F3A5F;
+    --dept-b:#2E7A63;
+    --dept-c:#93334A;
+    --dept-d:#B4832A;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(24,35,56,0.04), 0 6px 20px -8px rgba(24,35,56,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Sarabun',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.55;
+  }
+  ::selection{background:#CFE3DA;}
+  a{color:inherit;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--slate);
+  }
+
+  /* ---------- Header ---------- */
+  header.top{
+    position:sticky; top:0; z-index:40;
+    background:rgba(244,243,238,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{
+    max-width:1180px; margin:0 auto;
+    padding:22px 24px 16px;
+  }
+  .top-row{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  }
+  h1{
+    font-family:'Kanit',sans-serif;
+    font-weight:600;
+    font-size:26px;
+    margin:6px 0 4px;
+    color:var(--ink);
+    letter-spacing:-.01em;
+  }
+  .subtitle{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    max-width:560px;
+  }
+  .meta-box{
+    text-align:left;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--slate);
+    border-left:2px solid var(--line);
+    padding-left:12px;
+    min-width:190px;
+  }
+  .meta-box div{margin-bottom:3px;}
+  .meta-box b{color:var(--ink-soft); font-weight:600;}
+
+  .controls{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .search-wrap{
+    position:relative; flex:1; min-width:220px; max-width:340px;
+  }
+  .search-wrap input{
+    width:100%;
+    font-family:'Sarabun',sans-serif;
+    font-size:14px;
+    padding:9px 12px 9px 32px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    outline:none;
+  }
+  .search-wrap input:focus{border-color:var(--dept-a);}
+  .search-wrap svg{position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:.45;}
+
+  .pill-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill{
+    font-family:'Sarabun',sans-serif;
+    font-size:13.5px;
+    font-weight:500;
+    padding:8px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .pill:hover{border-color:#C9C5B5;}
+  .pill.active{
+    background:var(--ink); color:#fff; border-color:var(--ink);
+  }
+  .pill .count{opacity:.65; font-family:'JetBrains Mono',monospace; font-size:11px; margin-left:5px;}
+
+  /* ---------- Overview KPIs ---------- */
+  .overview{
+    max-width:1180px; margin:22px auto 0; padding:0 24px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  }
+  .kpi{
+    background:var(--card); border:1px solid var(--line-soft); border-radius:var(--radius);
+    padding:16px 18px; box-shadow:var(--shadow);
+  }
+  .kpi .num{
+    font-family:'Kanit',sans-serif; font-weight:600; font-size:30px; color:var(--ink);
+    line-height:1;
+  }
+  .kpi .label{margin-top:8px; font-size:12.5px; color:var(--slate);}
+  .kpi.accent-teal .num{color:var(--teal);}
+  .kpi.accent-amber .num{color:var(--amber);}
+
+  /* ---------- Main ---------- */
+  main{max-width:1180px; margin:0 auto; padding:28px 24px 80px;}
+
+  .dept-section{margin-top:36px;}
+  .dept-head{
+    display:flex; align-items:baseline; gap:10px; margin-bottom:14px;
+    padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  .dept-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0; margin-bottom:2px;}
+  .dept-head h2{
+    font-family:'Kanit',sans-serif; font-weight:600; font-size:17px; margin:0;
+    color:var(--ink);
+  }
+  .dept-head .dept-count{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--slate);
+  }
+
+  .card-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px;
+  }
+
+  .task-card{
+    background:var(--card); border:1px solid var(--line-soft); border-radius:var(--radius);
+    padding:16px 17px; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; gap:10px;
+    border-left:3px solid var(--dept-color, var(--ink));
+  }
+  .task-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
+  .task-no{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate);
+  }
+  .task-title{
+    font-family:'Kanit',sans-serif; font-weight:600; font-size:15px; color:var(--ink);
+    margin:2px 0 0; line-height:1.35;
+  }
+  .status-tag{
+    flex-shrink:0;
+    font-family:'Sarabun',sans-serif; font-size:11.5px; font-weight:600;
+    padding:4px 9px; border-radius:999px; white-space:nowrap;
+  }
+  .status-done{background:var(--teal-bg); color:var(--teal);}
+  .status-progress{background:var(--amber-bg); color:var(--amber);}
+  .status-none{background:#EEECE3; color:var(--slate);}
+
+  .meta-line{
+    font-size:12.5px; color:var(--slate); display:flex; flex-wrap:wrap; gap:4px 14px;
+  }
+  .meta-line span b{color:var(--ink-soft); font-weight:600;}
+
+  .latest-block{
+    background:var(--line-soft); border-radius:10px; padding:10px 12px;
+  }
+  .latest-block .latest-label{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--slate);
+    text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; display:block;
+  }
+  .latest-block .latest-text{font-size:13.5px; color:var(--ink-soft); white-space:pre-line;}
+  .stale-flag{
+    display:inline-block; margin-top:6px; font-size:11px; color:var(--burgundy);
+    font-weight:600;
+  }
+
+  .timeline-dots{display:flex; gap:4px; align-items:center; flex-wrap:wrap;}
+  .dot{
+    width:9px; height:9px; border-radius:50%; background:#DEDBCE; cursor:default; position:relative;
+  }
+  .dot.filled{background:var(--dept-color, var(--ink));}
+  .dot[data-tip]:hover::after{
+    content:attr(data-tip);
+    position:absolute; bottom:130%; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; font-size:11px; padding:6px 9px; border-radius:8px;
+    white-space:pre-line; width:200px; line-height:1.4; z-index:20; box-shadow:var(--shadow);
+    font-family:'Sarabun',sans-serif;
+  }
+
+  .expand-btn{
+    align-self:flex-start;
+    background:none; border:none; cursor:pointer;
+    font-family:'Sarabun',sans-serif; font-size:12.5px; font-weight:600; color:var(--dept-color,var(--ink));
+    padding:0; display:flex; align-items:center; gap:4px;
+  }
+  .expand-btn svg{transition:transform .15s;}
+  .task-card.expanded .expand-btn svg{transform:rotate(180deg);}
+
+  .full-timeline{display:none; flex-direction:column; gap:8px; margin-top:2px; border-top:1px dashed var(--line); padding-top:10px;}
+  .task-card.expanded .full-timeline{display:flex;}
+  .full-timeline .tl-entry{font-size:12.5px;}
+  .full-timeline .tl-entry .tl-label{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--slate); display:block; margin-bottom:2px;
+  }
+  .full-timeline .tl-entry .tl-text{color:var(--ink-soft); white-space:pre-line;}
+  .extra-fields{font-size:12px; color:var(--slate); border-top:1px dashed var(--line); padding-top:8px; margin-top:2px; display:none; flex-direction:column; gap:4px;}
+  .task-card.expanded .extra-fields{display:flex;}
+  .extra-fields b{color:var(--ink-soft);}
+
+  .empty-state{
+    text-align:center; padding:60px 20px; color:var(--slate); font-size:14px;
+  }
+
+  /* ---------- Sync + connection status ---------- */
+  .sync-btn{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:600;
+    padding:8px 14px; border-radius:10px;
+    border:1px solid var(--ink); background:var(--ink); color:#fff;
+    cursor:pointer; white-space:nowrap;
+    transition:opacity .15s;
+  }
+  .sync-btn:hover{opacity:.88;}
+  .sync-btn:disabled{opacity:.55; cursor:default;}
+  .sync-btn svg{transition:transform .6s linear;}
+  .sync-btn.spinning svg{animation:spin 0.8s linear infinite;}
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .conn-line{
+    display:flex; align-items:center; gap:6px;
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate);
+    margin-top:6px;
+  }
+  .conn-dot{width:7px; height:7px; border-radius:50%; background:#C9C5B5; flex-shrink:0;}
+  .conn-dot.ok{background:var(--teal);}
+  .conn-dot.err{background:var(--burgundy);}
+  .conn-dot.loading{background:var(--amber); animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+  /* ---------- KPI / progress bars ---------- */
+  .kpi.accent-navy .num{color:var(--dept-a);}
+  .progress-bar{
+    width:100%; height:6px; border-radius:999px; background:var(--line-soft); overflow:hidden;
+  }
+  .progress-fill{height:100%; border-radius:999px; background:var(--dept-color, var(--ink)); transition:width .4s ease;}
+  .dept-kpi-wrap{display:flex; align-items:center; gap:8px; margin-left:auto;}
+  .dept-kpi-num{
+    font-family:'JetBrains Mono',monospace; font-weight:600; font-size:12.5px; color:var(--ink-soft);
+    min-width:34px; text-align:right;
+  }
+  .dept-kpi-bar{width:90px;}
+
+  footer{
+    max-width:1180px; margin:0 auto; padding:24px 24px 50px;
+    border-top:1px solid var(--line);
+    font-size:12px; color:var(--slate);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+
+  @media (max-width:640px){
+    .overview{grid-template-columns:repeat(2,1fr);}
+    h1{font-size:21px;}
+    .meta-box{border-left:none; padding-left:0; border-top:1px solid var(--line); padding-top:8px; width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <div>
+        <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
+        <h1>แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
+        <div class="subtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
+      </div>
+      <div>
+        <div class="meta-box" id="metaBox"></div>
+        <button class="sync-btn" id="syncBtn" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          ซิงก์ข้อมูลล่าสุด
+        </button>
+        <div class="conn-line" id="connLine"><span class="conn-dot"></span><span>ยังไม่เชื่อมต่อ</span></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="ค้นหาเรื่อง / ผู้รับผิดชอบ...">
+      </div>
+      <div class="pill-row" id="deptPills"></div>
+    </div>
+  </div>
+</header>
+
+<section class="overview" id="overview"></section>
+
+<main id="mainContent"></main>
+
+<footer>
+  <span>เชื่อมต่อข้อมูลจาก Google Sheets ต้นทางแบบเรียลไทม์ (โหลดอัตโนมัติเมื่อเปิดหน้า และกด "ซิงก์ข้อมูลล่าสุด" เพื่อดึงข้อมูลใหม่ได้ทุกเมื่อ) — สถานะและ % ความคืบหน้าที่แสดงเป็นการประเมินอัตโนมัติจากคำในข้อความรายงานล่าสุดของแต่ละเรื่อง โปรดตรวจสอบความถูกต้องก่อนใช้อ้างอิงอย่างเป็นทางการ</span>
+  <span id="genNote"></span>
+</footer>
+
+<script id="dashboard-data" type="application/json">{"timeline_labels": ["สรุปการประชุม 17 พ.ย.68", "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "ผลการดำเนินงาน (ประชุม 12 ม.ค.69)", "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "ผลประชุม 23 มีนาคม 2569", "ผลประชุม 18 พฤษภาคม 2569", "29 มิถุนายน 2569", "13 กรกฎาคม 2569", "27 กรกฎาคม 2569", "10 สิงหาคม 2569"], "departments": [{"name": "งานฝ่ายบริหารและวางแผน  และ สารสนเทศ", "items": [{"id": 1, "no": "1", "title": "แผนงบประมาณ 70", "action": "1.คณบดีเลือก KPI ที่สำคัญ", "deadline": "", "responsible": "คณบดี", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "ฝ่ายแผน แจ้ง  และทำปฏิทินการดำเนินงาน"}, {"label": "ผลประชุม 23 มีนาคม 2569", "text": "รอปฏิทินดำเนินงานของมหาวิทยาลัย"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "รอชี้แจงงบฯ"}, {"label": "29 มิถุนายน 2569", "text": "อยู่ระหว่างชี้แจงสภาฯ"}, {"label": "27 กรกฎาคม 2569", "text": "รอผ่านสภามหาวิทยาลัย และเริ่มจัดทำแผนการดำเนินงาน (ประชุม 31 ก.ค.69)"}, {"label": "10 สิงหาคม 2569", "text": "ผ่านสภามหาวิทยาลัยแล้ว เริ่มจัดทำแผนการดำเนินงานให้ผู้บริหารแต่ละฝ่าย"}], "latest": {"label": "10 สิงหาคม 2569", "text": "ผ่านสภามหาวิทยาลัยแล้ว เริ่มจัดทำแผนการดำเนินงานให้ผู้บริหารแต่ละฝ่าย"}, "update_count": 6}]}, {"name": "งานฝ่ายวิชาการและพัฒนานิสิต และ สำนักวิชาฯ", "items": [{"id": 2, "no": "2", "title": "โครงการเทียนจิน", "action": "ชมรม Solar Car/ Training / \nก่อตั้งสถาบันรถไฟฯ", "deadline": "1.Training-สืบเนื่องฯ\n2.ก่อตั้งสถาบันรถไฟฯ-ประสานกองวิจัยฯ\n3.ชมรม Solar Car-สืบเนื่องฯ", "responsible": "คณบดีฯ", "note": "ชมรม  และอื่นๆ รองวิชาการฯ ประสานงาน/Solar Car มองโกเลีย,ออสเตรเลีย -รอความคืบหน้า,หารือเพิ่มเติม", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "สืบเนื่องการประชุมครั้งถัดไป  ชมรม  ขอกองกิจ เข้าที่ประชุม  or ตั้งชมรม F1"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "สืบเนื่องต่อ"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "ชมรม Solar Car / Training / \nก่อตั้งสถาบันรถไฟฯ พิจารณาตั้งงบประมาณ 2570 (โครงการภายใต้ความร่วมมือระหว่างประเทศ)"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "1.อยู่ระหว่างดำเนินการจัดทำแบบสำรวจ โดยมีการระบุงบประมาณ ระหว่าง 23,000-28,000 บาท 2.คณบดีอยากให้คณะช่วยสนับสนุนในส่วนของค่าลงทะเบียน โดยใช้เกณฑ์เดียวกันกับบริษัทที่ร่วม MOU 3.มอบรองบริหาร ร่างประกาศ"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "รอข้อมูล อ.เดชา"}, {"label": "ผลประชุม 23 มีนาคม 2569", "text": "สายวิชาการ  อีก 1 ท่าน   รอพิจารณาเพิ่มเติม"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "- เหลือนิสิตฝึกงานกลับมา 4 มิย.69 /หลักสูตรร่วมอยู่ระหว่างประสานงาน"}, {"label": "29 มิถุนายน 2569", "text": "เตรียมการเปิดศูนย์ EP IP"}, {"label": "27 กรกฎาคม 2569", "text": "ติดตามครั้งต่อไป"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "ติดตามครั้งต่อไป"}, "update_count": 9}, {"id": 3, "no": "3", "title": "หลักสูตรระยะสั้น", "action": "หลักสูตรภาษาจีน/ ภาษาอังกฤษ เป็นหลักสูตร ... เลือกกลุ่มเป้าหมาย มอบฝ่ายวิชาการฯ", "deadline": "สืบเนื่องฯ", "responsible": "รองวิชาการฯ/ หน.สำนักวิชาฯ", "note": "คุณเสาวลักษณ์ ประสานงาน/ \nรองวิชาการฯ ทำตุ๊กตาหารือเพิ่มเติม, คูปองพัฒนาตนเอง", "kpi": "", "timeline": [{"label": "สรุปการประชุม 17 พ.ย.68", "text": "-คูปองพัฒนาตนเองเริ่มเทอม 2/68\n-Skill STRANSCRIPT"}, {"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "- คูปองฯ เริ่มดำเนินการแล้ว\n-สืบเนื่องการประชุมครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "7"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "อยู่ระหว่างประสานงาน"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "คลังเครดิต ดำเนินการตามเป้าหมาย/ ภาษาต่างประเทศ \n1.รองวิชาการฯติดต่อผู้สอนภาษา\n2.รองวิชาการฯ ดำเนินการสืบข้อมูลคอร์สอบรมและงบประมาณที่ต้องใช้ \nจากสถาบันสอนภาษาและแจ้งในการประชุมครั้งถัดไป\n3. อาจารย์ 10 ท่าน+นิสิต 20 คน \n4.หลักสูตรระยะสั้น หารือในประชุม กก.บริการวิชาการ"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "1.ให้จัดเตรียมแผน เตรียมฐานข้อมูล เพื่อดำเนินการจัดอบรมต่อไป (หลักสูตรระยะสั้น) 2.จัดอบรมภาษาอังกฤษ ให้ตั้งโครงการ เพื่อเบิกงบประมาณ (โครงการการฝึกอบรมและเพิ่มทักษะที่จำเป็นให้กับนิสิตที่กำลังจะสำเร็จการศึกษา และบุคคลภายนอก250,000.00 งานบริการวิชาการ )"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "ดำเนินการตาม กพร. ครบถ้วนแล้ว"}, {"label": "ผลประชุม 23 มีนาคม 2569", "text": "พิจารณาดำเนินงานโครงการเพิ่มเติม เช่น เปิดโครงการหลักสูตรฝึกอบรม"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "คลังเครดิต มหาวิทยาลัยเปิดให้เรียบร้อยร้อย/หลักสูตรระยะสั้น ให้เร่งดำเนินการ (ให้นำเข้าหารือในที่ประชุม กก.บริการวิชาการ) /เริ่มต้นที่หลักสูตร PLC และพลังงานทดแทน (หารือในที่ประชุม กก.บริการวิชาการ)"}, {"label": "29 มิถุนายน 2569", "text": "มอบงานบริการวิชาการดูแล"}, {"label": "27 กรกฎาคม 2569", "text": "1.จีนให้โควต้า จำนวน ฝึกงาน 90 ที่นั่ง   2.พิจารณาตั้ง กก.ฝึกงานคณะฯ  3.อ.ให้คำปรึกษานิสิตด้านสุขภาพจิต  งานวิชาการ+กิจการนิสิต ทำโครงร่างแต่งตั้งคณะกรรมการมานำเสนอ"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "1.จีนให้โควต้า จำนวน ฝึกงาน 90 ที่นั่ง   2.พิจารณาตั้ง กก.ฝึกงานคณะฯ  3.อ.ให้คำปรึกษานิสิตด้านสุขภาพจิต  งานวิชาการ+กิจการนิสิต ทำโครงร่างแต่งตั้งคณะกรรมการมานำเสนอ"}, "update_count": 11}, {"id": 4, "no": "4", "title": "คลังเครดิต", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "29 มิถุนายน 2569", "text": "งานวิชาการดูแล"}, {"label": "27 กรกฎาคม 2569", "text": "ติดตามครั้งต่อไป"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "ติดตามครั้งต่อไป"}, "update_count": 2}, {"id": 5, "no": "5", "title": "ภาษาต่างประเทศ", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "29 มิถุนายน 2569", "text": "ติดตามต่อ"}, {"label": "27 กรกฎาคม 2569", "text": "ปรับยุบรวมหัวข้อ"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "ปรับยุบรวมหัวข้อ"}, "update_count": 2}, {"id": 6, "no": "6", "title": "โครงการหลักสูตรอบรมภาษาจีน/ ภาษาอังกฤษ (เพิ่ม 23 มี.ค.69)", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลประชุม 23 มีนาคม 2569", "text": "หลักสูตรอบรมภาษาจีน/ ภาษาอังกฤษ/ ญี่ปุ่น"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "เปิดเทอมดำเนินการต่อ (ผช.กิจการนิสิตดำเนินการ)"}], "latest": {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "เปิดเทอมดำเนินการต่อ (ผช.กิจการนิสิตดำเนินการ)"}, "update_count": 2}, {"id": 7, "no": "7", "title": "กรรมการฝึกงานคณะ / การฝึกงานของนิสิตในต่างประเทศ/เครือข่ายฝึกงานในบริษัท ณ ต่างประเทศ (ลาว คุณสุภาวิตา)", "action": "มอบรองฯ วิชาการ", "deadline": "สืบเนื่องฯ/ ติดตามผลต่อ", "responsible": "รองวิชาการฯ/\n หน.สำนักวิชาฯ", "note": "-การตั้ง กรรมการฯ\n-ภาระงานของ กก.ชุดนี้", "kpi": "", "timeline": [{"label": "สรุปการประชุม 17 พ.ย.68", "text": "ติดตาม\n-การตั้ง กรรมการฯ\n-ภาระงานของ กก.ชุดนี้"}, {"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "- ยังไม่ดำเนินการ/ อยู่ระหว่าง\nประธานหลักสูตรคัดกรอง กก.\n-สืบเนื่องการประชุมครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "ประชุมไปแล้ว 2 รอบ อยู่ระหว่างให้ไปสรุปข้อมูล มีการแจ้งยอดนิสิต\n และให้แต่ละสาขาพิจารณาบริษัทฯ ข้อมูลให้ได้ก่อนปฐมนิเทศ"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "1.อยู่ระหว่างดำเนินการติดตามข้อมูลนิสิตฝึกงาน ถึง 27 กุมภาพันธ์ 2569 2.ติดตามรายงานการประชุมการฝึกงานรอบหน้า"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "1.ดำเนินการผ่านระบบ ฐานข้อมูล  \n2.อยุ่ระหว่างตั้ง กก.กิจการนิสิต"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "อยากให้ KM ร่วมกับอาจารย์/ติดการระบบการฝึกกงานทั้งระบบ"}, {"label": "29 มิถุนายน 2569", "text": "มอบรองวิชาการหารือ"}, {"label": "27 กรกฎาคม 2569", "text": "งานวิชาการ+กิจการนิสิต ทำโครงร่างแต่งตั้งคณะกรรมการมานำเสนอ"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "งานวิชาการ+กิจการนิสิต ทำโครงร่างแต่งตั้งคณะกรรมการมานำเสนอ"}, "update_count": 8}, {"id": 8, "no": "8", "title": "การคัดเลือก PJ2 /โครงการ Engineering PROject for MSU", "action": "พิจารณาผลจากการประกวด pj1 /\nหลักสูตรละ 1 ผลงาน", "deadline": "สืบเนื่องฯ/ ติดตามผลต่อ", "responsible": "รองวิชาการฯ/\n หน.สำนักวิชาฯ", "note": "อนุมัติรอบที่ 1  จำนวน 10 PJ", "kpi": "", "timeline": [{"label": "สรุปการประชุม 17 พ.ย.68", "text": "ขาดสาขาการผลิต /\n รถไฟความเร็วสูง"}, {"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "-เพิ่มมาอีก 7 กลุ่ม\n-สืบเนื่องการประชุมครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "ให้ดำเนินการจัดในปีหน้า"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "ให้ดำเนินการจัดในปีหน้า"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "1.เลื่อนเป็นปีการศึกษาหน้า"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "1.เลื่อนเป็นปีการศึกษาหน้า"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "สืบเนื่อง"}, {"label": "29 มิถุนายน 2569", "text": "คณบดีหารือกับหัวหน้าสำนักวิชา"}], "latest": {"label": "29 มิถุนายน 2569", "text": "คณบดีหารือกับหัวหน้าสำนักวิชา"}, "update_count": 8}, {"id": 9, "no": "9", "title": "ABET/ TABEE", "action": "ก่อนปีใหม่เลือกหลักสูตร", "deadline": "สืบเนื่องฯ", "responsible": "รองวิชาการฯ/ หน.สำนักวิชาฯ", "note": "รองวิชาการฯ ประสานงาน \nยืนยัน AUN-QA", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "-สืบเนื่องการประชุมครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "สืบเนื่องต่อ"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "1.หลักสูตร ป.ตรี อยู่ระหว่างหากำหนดเวลาดำเนินการ ในการประชุมอนุ กก.วิชาการ \nวันที่ 11 ก.พ.69 เพื่อกำหนดแผนปรับปรุงหลักสูตร\n2.ระดับบัณฑิตศึกษา วันที่ 11 ก.พ.69 (บ่าย) พิจารณาปรับปรุงหลักสูตร"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "1.ดำเนินการที่โครงการสัมมนาเรียบร้อยแล้ว"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "สืบเนื่อง"}, {"label": "29 มิถุนายน 2569", "text": "ติดตามต่อไป"}], "latest": {"label": "29 มิถุนายน 2569", "text": "ติดตามต่อไป"}, "update_count": 6}, {"id": 10, "no": "10", "title": "ปรับปรุงหลักสูตร", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "1.รออัปเดตข้อมูลในโครงการ KM อาจารย์ 25 กพ 69"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ส่งผู้เชี่ยวชาญเรียบร้อย-รอบหน้าเอาปฏิทินแผนการดำเนินงานมาดูด้วย"}, {"label": "29 มิถุนายน 2569", "text": "อยู่ระหว่างดำเนินการ และนำเข้าที่ประชุมวิชาการรอบหน้า"}], "latest": {"label": "29 มิถุนายน 2569", "text": "อยู่ระหว่างดำเนินการ และนำเข้าที่ประชุมวิชาการรอบหน้า"}, "update_count": 3}, {"id": 11, "no": "12", "title": "MSU JLASTC (Jilin Agricultural Science and Technology University  หลักสูตร 3+1 ว.อาหาร", "action": "", "deadline": "", "responsible": "รองวิชาการฯ/\n หน.สำนักวิชาฯ", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "-กิจกรรมการส่งนิสิตไปแลกเปลี่ยน\n- สืบเนื่องครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "ให้หลักสูตรชีวภาพ และงานวิเทศสัมพันธ์ประสานงานต่อ CAMS(สถาบัน)"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "สืนเนื่องต่อไป"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "สืนเนื่องต่อไป"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "มหาลัยดำเนินการ MOU เรียบร้อย/อยู่ระหว่างดำเนินการประสานงาน"}, {"label": "29 มิถุนายน 2569", "text": "รองบริหารและรองวิจัยประสานงานต่อ"}], "latest": {"label": "29 มิถุนายน 2569", "text": "รองบริหารและรองวิจัยประสานงานต่อ"}, "update_count": 6}, {"id": 12, "no": "13", "title": "บริษัทไทยนิปปอน", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "29 มิถุนายน 2569", "text": "ทำ MOU กับ Mino"}, {"label": "27 กรกฎาคม 2569", "text": "MOU เสร้จแล้ว  รอคณะ กก.ดำเนินงาน"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "MOU เสร้จแล้ว  รอคณะ กก.ดำเนินงาน"}, "update_count": 2}, {"id": 13, "no": "14", "title": "ฝึกงานบริษัท ชิบูย่า (เพิ่ม 8 ธ.ค.68)", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "- สอบถามรายละเอียดเพิ่มเติม อ.วสันต์ \n-สืบเนื่อง"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "มอบวิชาการประชาสัมพันธ์ต่อไป"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "มอบรองวิจัยฯ ประสานงาน อ.วสันต์+อ.ปริญญ์ (อาจไปพร้อม STISWB"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "อยู่ระหว่างประสาน เพิ่งนำเข้าที่ประชุมอนุวิจัยรอบที่ผ่านมา อยู่ระหว่างนำเข้าที่ประชุม กก.ประจำคณะ 25 กพ 69"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "สืนเนื่องต่อไป (MOU ผ่านแล้ว) อาจไปพร้อม STISWB"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ลงนาม MOU 12 มิย.69"}, {"label": "29 มิถุนายน 2569", "text": "เดือน สค.ทางผู้บริหารชิบูย่าจะเดินทางมาที่ประเทศไทย และจะมอบ อ.วสันต์ดำเนินการต่อไป (เตรียมฝึกงานและวิจัย)"}], "latest": {"label": "29 มิถุนายน 2569", "text": "เดือน สค.ทางผู้บริหารชิบูย่าจะเดินทางมาที่ประเทศไทย และจะมอบ อ.วสันต์ดำเนินการต่อไป (เตรียมฝึกงานและวิจัย)"}, "update_count": 7}]}, {"name": "งานฝ่ายวิจัย นวัตกรรมและวิเทศสัมพันธ์", "items": [{"id": 14, "no": "17", "title": "เพิ่มเติม MOU LCI+KC Prop", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "29 มิถุนายน 2569", "text": "MOU ผ่าน กก.วิเทศเรียบร้อย รอเข้าที่ประชุม กก.มหาวิทยาลัย"}, {"label": "27 กรกฎาคม 2569", "text": "คาดว่าลงนามMOU เดือนกันยายน 69"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "คาดว่าลงนามMOU เดือนกันยายน 69"}, "update_count": 2}, {"id": 15, "no": "18", "title": "MOU Guilin University", "action": "รองวิจัยฯ ประสานงานความสะดวกGuilin", "deadline": "สืบเนื่องฯ/ ติดตามผลต่อ", "responsible": "รองวิจัยฯ", "note": "แนะนำ มี.ค.69", "kpi": "", "timeline": [{"label": "สรุปการประชุม 17 พ.ย.68", "text": "ประสานงานกิจกรรมเพิ่มเติม"}, {"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "-สืบเนื่องการประชุมครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "คอนเฟิร์ม เป็น เดือน มีนาคม 69 (รอเช็คคิวอธิการ)"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "อยูู่ระหว่างประสานงาน กำหนดการระหว่างช่วงหลังรับปริญญา"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "อยู่ระหว่างประสานรวบรวมข้อมูลผู้เข้าร่วม วัน/เวลา ส่งอาจารย์สัก 2 คนไปดูงานเพื่อประสานงาน รอสาขาโยธาประชุมฯ"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ลงนามทางไปรษณีย์"}, {"label": "29 มิถุนายน 2569", "text": "รอทางGuilin ส่งเอกสารมาทางคณะ"}, {"label": "27 กรกฎาคม 2569", "text": "ส่งเอกสารมาทางคณะเรียบร้อย เพื่อให้อธิการบดีลงนาม"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "ส่งเอกสารมาทางคณะเรียบร้อย เพื่อให้อธิการบดีลงนาม"}, "update_count": 8}, {"id": 16, "no": "19", "title": "MOU (23 กพ 69)Jee Teng Co.", "action": "", "deadline": "", "responsible": "รองวิจัยฯ/ อ.เดชา", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "- นำเข้า กก.ประจำคณะฯ"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "ยังไม่คืบหน้า รอร่าง MOU"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "คณบดีจะไปหารือในช่วงที่ไปจีน"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "รอ ร่าง MOU อยากมาบริจาคชาร์ตเจอร์"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "รอประสานงาน"}, {"label": "29 มิถุนายน 2569", "text": "รอประสานงาน"}], "latest": {"label": "29 มิถุนายน 2569", "text": "รอประสานงาน"}, "update_count": 6}, {"id": 17, "no": "20", "title": "MOA Tianjin Railway Technical & Vocational College", "action": "", "deadline": "", "responsible": "รองวิจัยฯ /อ.เดชา", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "-คุณพัชรา ตามแผนกับ อ.เดชา \nนำเข้ารายงานครั้งหน้า"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "ฝากสอบถามกิจกรรมที่จะทำร่วมกันเพิ่มเติม"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "Tianjin / MOA แล้ว"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "เชิญอาจารย์"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "นำเข้า กก ประจำคณะ อีกครั้ง"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ดำเนินการเรียบร้อย"}, {"label": "29 มิถุนายน 2569", "text": "ดำเนินการเรียบร้อย/อยู่ระหว่างหารือเรื่องทุนการศึกษาให้กับนิสิตระดับ ป.โท"}, {"label": "27 กรกฎาคม 2569", "text": "อยู่ระหว่างขอทุนให้ระดับบัณฑิตศึกษา 5 คน  (ผู้ประสานงานTianjin รถไฟ - อ.เดชา/  ยานยนต์ไฟฟ้า อ.ทวีศักดิ์)"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "อยู่ระหว่างขอทุนให้ระดับบัณฑิตศึกษา 5 คน  (ผู้ประสานงานTianjin รถไฟ - อ.เดชา/  ยานยนต์ไฟฟ้า อ.ทวีศักดิ์)"}, "update_count": 8}, {"id": 18, "no": "", "title": "สอบถามเรื่องสาขาขาดแคลน หากดำเนินการได้ จะได้ตั้งในงบประมาณ ในปี 2570 ต่อไป", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "ทำบันทึกข้อความสอบถาม/ หารือ"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "ฝากประสานงาน/สอบถาม"}], "latest": {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "ฝากประสานงาน/สอบถาม"}, "update_count": 2}, {"id": 19, "no": "*", "title": "VDO ประชาสัมพันธ์ (23 กพ 69)", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "พิจารณาอัพเดท, Native"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ฝากฝ่ายอำนวยการดำเนินการทำผังคณะ และมอบฝ่ายกิจการนิสิตทำ VCO แนะนำคณะ"}, {"label": "29 มิถุนายน 2569", "text": "หารือร่วมกับ ปชส.มหาวิทยาลัย"}], "latest": {"label": "29 มิถุนายน 2569", "text": "หารือร่วมกับ ปชส.มหาวิทยาลัย"}, "update_count": 3}]}, {"name": "งาน ฝ่ายอำนวยการ และโครงสร้างพื้นฐานคณะ  ปฏิบัติการวิศวกรรม", "items": [{"id": 20, "no": "21", "title": "งานครุภัณฑ์ 69", "action": "เร่งดำเนินการ เพื่อของบกลางปี69", "deadline": "สืบเนื่องฯ", "responsible": "ผช.โครงสร้างฯ", "note": "", "kpi": "", "timeline": [{"label": "สรุปการประชุม 17 พ.ย.68", "text": "รายงานความก้าวหน้า"}, {"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "-ทำสัญญา 19 จาก 32 รายการ  \n-เบิกจ่ายแล้ว 3 รายการ \n-1 รายการเปิดซองแล้ว ยังไม่ได้\nผู้ประกอบการ"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "ความคืบหน้า ประมาณ 70%\n- แผน 5 ปีงบลงทุนฯ (ฝากรองอำนวยการ)"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "ขอดูข้อมูลครุภัณฑ์"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "รายงานครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "เหลือ EV"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "อยู่ระหว่างดำเนินการ"}, {"label": "ผลประชุม 23 มีนาคม 2569", "text": "เหลือ 1 รายการ"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "เร่งฝ่ายพัสดุติดตามและให้ดำเนินงานผลการดำเนินงานรอบหน้า"}, {"label": "29 มิถุนายน 2569", "text": "มอบฝ่ายอำนวยการอัปเดตรอบหน้า"}, {"label": "27 กรกฎาคม 2569", "text": "พยุงศักดิ์ อัพเดท"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "พยุงศักดิ์ อัพเดท"}, "update_count": 11}, {"id": 21, "no": "22", "title": "ภาพแผนที่คณะ ชื่อตึก", "action": "มอบ ผช.โครงสร้างพื้นฐาน", "deadline": "สืบเนื่องฯ/ ติดตามผลต่อ", "responsible": "ผช.โครงสร้างพื้นฐาน", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "- อยู่ระหว่างดำเนินการ\n ปรับเพิ่ม ภาพ"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "-สืบเนื่อง (ผช.โครงสร้างฯ) เพื่อลงเว้บไซต์คณะ \n-ป้ายด้านหลังตึก ใช้แบบหน้าตึกคณะ"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "ทำภาพประชาสัมพันธ์เพิ่มเติม"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "ดำเนินการเรียบร้อย/ ปรับเพิ่มเติมให้สวยงามมากขึ้น"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "พิจารณา ตรวจสอบ อัพเดท"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ประสาน อ.ศิวา ในการทำแผนที่อาคาร"}, {"label": "29 มิถุนายน 2569", "text": "สอบถามรอบอำนวยการ/รายงานรอบต่อไป"}, {"label": "27 กรกฎาคม 2569", "text": "ตามรองอำนวยการ"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "ตามรองอำนวยการ"}, "update_count": 8}, {"id": 22, "no": "23", "title": "โครงการความปลอดภัยคณะ/ ห้องปฏิบัติการ", "action": "ESPReL ห้องใดบ้าง?", "deadline": "สืบเนื่องฯ  อยู่ระหว่างร่างนโยบาย", "responsible": "ผช.ปฏิบัติการวิศวกรรม", "note": "สิ่งที่ควรปรับปรุง ห้องอาบน้ำ,การจัดเก็บเคมีภัณฑ์,\nโครงสร้างผู้รับผิดชอบที่ชัดเจน", "kpi": "", "timeline": [{"label": "สรุปการประชุม 17 พ.ย.68", "text": "ซ้อมหนีไฟ/ อัคคีภัย"}, {"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "- อยูู่ระหว่างร่าง แผนป้องกันอัคคีภัย\n-อยู่ระหว่างดำเนินการจัดทำแผน\n อพยพ, หนีไฟ \n- ดำเนินการจัดทำโครงการฯ จัดหาวันดำเนินการ\n- ป้ายหนีไฟ อยู่ระหว่างดำเนินการ\n 2. ห้อง ESPReL\n-"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "-สืบเนื่อง มอบ ผช. โครงสร้างพื้นฐานรายงานความคืบหน้า\n-พรุ่งนี้มีประชุม กก.ความปลอดภัยมหาวิทยาลัย\n-จัดทำร่างฯ กก.ความปลอดภัยคณะฯ เข้ากำกับ + กก.ประจำคณะฯ"}, {"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "มี กก.ประเมินจากมหิดล มีค่าใช้จ่ายในการตรวจ ห้องละ 5000 บาท คณะวิศวฯ มีห้อง อ.อดิศักดิ์ และคุณภูพิงค์"}, {"label": "ผลการดำเนินงาน (ประชุม 23 ก.พ.69)", "text": "อยู่ระหว่างรอคณะกรรมการตรวจสอบ"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "ผช.ปฏิบัติการวิศกรรม / มี2 ห้อง คือ  สิ่งแวดล้อม และ อ.อดิศักดิ์"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ให้กำหนดระยะเวลา/กพร ต้องมี 1 ห้องที่ผ่านการตรวจ"}, {"label": "29 มิถุนายน 2569", "text": "รอตึกเสร็จ แล้วค่อยหารือต่อ"}, {"label": "27 กรกฎาคม 2569", "text": "จัดโครงการเดือนสิงหาคม 69"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "จัดโครงการเดือนสิงหาคม 69"}, "update_count": 9}, {"id": 23, "no": "25", "title": "ติดตามเรื่องการจัดการเรียนการสอน(รายวิชาสอน) หลังเวลาราชการ (ดึก)\n(วาระเพิ่มเติม 17 พ.ย.)", "action": "", "deadline": "", "responsible": "/ผช.สารสนเทศ", "note": "ผู้นำเสนอ", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 8 ธ.ค.68)", "text": "-สืบเนื่องการประชุมครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "ปิดประตูตอน 20.00น. (ข้างตึก)  หลัง 20.00น. ออกด้านหล้งตึก  รวมถึงห้องเรียน สอนหลัง 20.00น.  ผู้สอนปิดห้องเอง"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "ดำเนินการเรียบร้อย/ ปิดแจ้งการดำเนินการปิดประตู"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "บางหลักสูตรเริ่มดำเนินการแล้ว"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ฝายวิชาการดำเนินการวางแผน"}, {"label": "29 มิถุนายน 2569", "text": "ติดตามผลการดำเนินการ 1/69 และรายงานรอบต่อไป"}, {"label": "27 กรกฎาคม 2569", "text": "หัวหน้าสำนักวิชาฯ ตรวจสอบ และนำเสนอครั้งถัดไป"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "หัวหน้าสำนักวิชาฯ ตรวจสอบ และนำเสนอครั้งถัดไป"}, "update_count": 7}, {"id": 24, "no": "26", "title": "แบบที่จะต่อเติมอาคารประลองชั้น 2 (เครื่องกล) ใช้ทำเป็นห้องอะไร? (วาระเพิ่มเติม 17 ธ.ค.)", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 17 ธ.ค.68)", "text": "สืบเนื่อง  มอบ ผช. โครงสร้างพื้นฐานรายงานความคืบหน้า"}, {"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "ของบ 70 (ทำแบบ)  แลปเครื่องกล ชั้น2"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "สืบเนื่อง เพื่อพิจารณาความเป็นไปได้ตั้ง งปม.70"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "สืบเนื่อง"}, {"label": "29 มิถุนายน 2569", "text": "สืบเนื่อง"}, {"label": "27 กรกฎาคม 2569", "text": "รอแบบอยู่"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "รอแบบอยู่"}, "update_count": 6}, {"id": 25, "no": "27", "title": "ฝากติดตามแทงจำหน่ายครุภัณฑ์", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 26 ม.ค.69)", "text": "ฝากติดตามต่อไป"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "รองอำนวยการ แจ้ง ประสานงานคุณชญาภา ช่วยดำเนินงานแทงจำหน่ายพัสดุ"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ติดตามต่อ"}, {"label": "29 มิถุนายน 2569", "text": "วันที่ 30 มิย.69 ขายทอดตลาด"}], "latest": {"label": "29 มิถุนายน 2569", "text": "วันที่ 30 มิย.69 ขายทอดตลาด"}, "update_count": 4}, {"id": 26, "no": "28", "title": "สโตร์กลาง รอบหน้าให้เตรียมข้อมูล", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 9 ก.พ.69)", "text": "สืบเนื่องในครั้งถัดไป"}, {"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "รอบหน้าให้เตรียมข้อมูล"}, {"label": "ผลประชุม 23 มีนาคม 2569", "text": "อยู่ระหว่างจัดระบบงาน"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "ติดตามต่อ"}, {"label": "29 มิถุนายน 2569", "text": "รอจัดซื้อครุภัณฑ์เพิ่มเติม"}, {"label": "27 กรกฎาคม 2569", "text": "อัพเดทความก้าวหน้า ประชุมรอบหน้า"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "อัพเดทความก้าวหน้า ประชุมรอบหน้า"}, "update_count": 6}, {"id": 27, "no": "*", "title": "เว็ปไซต์คณะ (23 กพ 69)", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "อัพเดทข้อมูลแล้ว"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "อยู่ระหว่างดำเนินการ ITA และปรับปรุงเว็ปไซต์ให้สวยงาม"}, {"label": "29 มิถุนายน 2569", "text": "อยู่ระหว่างกำกับติดตาม"}], "latest": {"label": "29 มิถุนายน 2569", "text": "อยู่ระหว่างกำกับติดตาม"}, "update_count": 3}, {"id": 29, "no": "*", "title": "ปรับปรุงภูมิทัศน์ 1.อาคารตึกใหญ่ 1  2.หลังอาคาร3 (ติดถนน) (23 กพ 69)", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "ผลการดำเนินงาน (ประชุม 3 มี.ค.69)", "text": "รองอำนวยการ สืบเนื่อง ต่อไป"}, {"label": "ผลประชุม 18 พฤษภาคม 2569", "text": "มอบ.ฝ่ายกิจการนิสิตดำเนินการ"}, {"label": "29 มิถุนายน 2569", "text": "คณบดีหารือรองอำนวยการเพิ่มเติม"}, {"label": "27 กรกฎาคม 2569", "text": "อัพเดทความก้าวหน้า ประชุมรอบหน้า"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "อัพเดทความก้าวหน้า ประชุมรอบหน้า"}, "update_count": 4}, {"id": 30, "no": "", "title": "มอบฝ่ายอาคารสถานที่ จัดทำแผนการใช้ห้องของทั้งคณะ (เพิ่ม 27 ก.ค.69)", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [], "latest": null, "update_count": 0}, {"id": 31, "no": "*", "title": "อัพเดทข้อมูลด้านระบบสารสนเทศของฝ่ายงานต่างๆ", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [], "latest": null, "update_count": 0}, {"id": 32, "no": "*", "title": "กำหนดการสัมมนาผู้บริหารร่วมกับบุคลากรสายสนับสนุน", "action": "", "deadline": "", "responsible": "", "note": "", "kpi": "", "timeline": [{"label": "27 กรกฎาคม 2569", "text": "เบื้องต้น วันที่พุธ 3 - ศุกร์ที่ 5 กันยายน 69"}], "latest": {"label": "27 กรกฎาคม 2569", "text": "เบื้องต้น วันที่พุธ 3 - ศุกร์ที่ 5 กันยายน 69"}, "update_count": 1}]}], "generated_note": "ข้อมูล ณ ไฟล์ล่าสุดที่อัปโหลด (คอลัมน์ล่าสุด: 10 สิงหาคม 2569)"}</script>
+<script>
+(function(){
+  const SHEET_ID = '1A9GP2bMue6FVqiWDIOXZVY0JUoV5hVPN';
+  const GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=0`;
+
+  const DEPT_COLORS = ['var(--dept-a)','var(--dept-b)','var(--dept-c)','var(--dept-d)'];
+
+  // ---------- Status keyword classification ----------
+  // ผู้ใช้ต้องการทราบว่างานแต่ละงาน "สำเร็จ" ได้อย่างไร: ระบบนี้ตรวจจากคำในช่อง
+  // "ผลการดำเนินงาน" ของรอบล่าสุดที่มีข้อมูล โดยจับกลุ่มคำที่บ่งชี้ว่างานเสร็จสิ้นแล้ว
+  // เทียบกับคำที่บ่งชี้ว่ายังดำเนินการอยู่ นี่เป็นการประเมิน "โดยประมาณ" จากข้อความ
+  // ไม่ใช่การยืนยันจากผู้กรอกโดยตรง — แนะนำให้เพิ่มคอลัมน์สถานะ/เปอร์เซ็นต์ที่กรอกเองในชีท
+  // เพื่อความแม่นยำในระยะยาว หากต้องการความแม่นยำ 100%
+  const DONE_KEYWORDS = [
+    'เสร็จสิ้น','แล้วเสร็จ','เสร็จแล้ว','เสร้จแล้ว','เสร็จเรียบร้อย',
+    'ดำเนินการเรียบร้อย','เรียบร้อยแล้ว','ดำเนินการแล้วเสร็จ','ครบถ้วนแล้ว',
+    'ผ่านแล้ว','ผ่านเรียบร้อย','บรรลุเป้าหมาย','ลงนามเรียบร้อย','ปิดงาน',
+    'อัปเดทข้อมูลแล้ว','ดำเนินงานเรียบร้อย','เปิดเรียบร้อย','ดำเนินการตามเป้าหมาย'
+  ];
+  const PROGRESS_KEYWORDS = ['รอ','สืบเนื่อง','อยู่ระหว่าง','เตรียม','ประสาน','พิจารณา','ติดตาม'];
+
+  function classify(item){
+    if(!item.latest) return {key:'none', label:'ยังไม่มีรายงาน', percent:0};
+    const t = item.latest.text;
+    if(DONE_KEYWORDS.some(k => t.includes(k))) return {key:'done', label:'ดำเนินการสำเร็จ', percent:100};
+    if(PROGRESS_KEYWORDS.some(k => t.includes(k))) return {key:'progress', label:'กำลังดำเนินการ', percent:50};
+    return {key:'progress', label:'กำลังดำเนินการ', percent:50};
+  }
+
+  function isStale(item, lastLabel){
+    if(!item.latest) return false;
+    return item.latest.label !== lastLabel;
+  }
+
+  function escapeHtml(s){
+    return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ---------- Robust CSV parser (handles quoted fields, embedded newlines/commas) ----------
+  function parseCSV(text){
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+    for(let i=0; i<text.length; i++){
+      const c = text[i];
+      if(inQuotes){
+        if(c === '"'){
+          if(text[i+1] === '"'){ field += '"'; i++; }
+          else{ inQuotes = false; }
+        } else {
+          field += c;
+        }
+      } else {
+        if(c === '"'){ inQuotes = true; }
+        else if(c === ','){ row.push(field); field = ''; }
+        else if(c === '\r'){ /* skip */ }
+        else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+        else { field += c; }
+      }
+    }
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  // ---------- Build dashboard data from raw CSV rows, detecting columns by header text ----------
+  function buildDataFromRows(rows){
+    // find header row: first row containing both 'ที่' and 'เรื่อง' as exact-trimmed cells
+    let headerRowIdx = -1;
+    for(let i=0; i<Math.min(rows.length, 8); i++){
+      const cells = rows[i].map(c=>c.trim());
+      if(cells.includes('ที่') && cells.includes('เรื่อง')){ headerRowIdx = i; break; }
+    }
+    if(headerRowIdx === -1) throw new Error('ไม่พบแถวหัวตาราง (ที่/เรื่อง)');
+
+    const header = rows[headerRowIdx].map(c=>c.trim().replace(/^"+|"+$/g,'').replace(/\s+/g,' '));
+    let noCol=-1, titleCol=-1, actionCol=-1, deadlineCol=-1, respCol=-1, noteCol=-1, kpiCol=-1;
+    const timelineCols = [];
+
+    header.forEach((h, idx) => {
+      if(!h) return;
+      if(h === 'ที่' && noCol === -1){ noCol = idx; return; }
+      if(h === 'เรื่อง' && titleCol === -1){ titleCol = idx; return; }
+      if(h === 'การดำเนินการ' && actionCol === -1){ actionCol = idx; return; }
+      if(h === 'กำหนดเวลา' && deadlineCol === -1){ deadlineCol = idx; return; }
+      if(h.includes('ผู้รับผิดชอบ') && respCol === -1){ respCol = idx; return; }
+      if(h === 'หมายเหตุ' && noteCol === -1){ noteCol = idx; return; }
+      if(h.includes('ความคืบหน้า') && h.includes('KPI') && kpiCol === -1){ kpiCol = idx; return; }
+      // everything else with header text -> treated as a timeline/meeting column
+      timelineCols.push({index: idx, label: h});
+    });
+
+    const departments = [];
+    let current = null;
+    let itemId = 0;
+    const width = header.length;
+
+    for(let i = headerRowIdx + 1; i < rows.length; i++){
+      const r = rows[i];
+      const cells = [];
+      for(let j=0; j<width; j++){ cells.push((r[j]||'').trim()); }
+      const nonEmptyIdx = cells.map((c,idx)=>c?idx:-1).filter(idx=>idx!==-1);
+
+      if(nonEmptyIdx.length === 1 && cells[nonEmptyIdx[0]].includes('ฝ่าย') && cells[nonEmptyIdx[0]].trim().startsWith('งาน')){
+        current = {name: cells[nonEmptyIdx[0]], items: []};
+        departments.push(current);
+        continue;
+      }
+
+      const title = titleCol!==-1 ? cells[titleCol] : '';
+      const no = noCol!==-1 ? cells[noCol] : '';
+      if(!title && !no) continue; // blank spacer row
+      if(!title) continue; // no title -> nothing meaningful to show
+
+      if(!current){ current = {name:'อื่นๆ', items:[]}; departments.push(current); }
+
+      const timeline = timelineCols
+        .map(tc => ({label: tc.label, text: cells[tc.index]}))
+        .filter(t => t.text);
+
+      itemId++;
+      current.items.push({
+        id: itemId,
+        no: no,
+        title: title,
+        action: actionCol!==-1 ? cells[actionCol] : '',
+        deadline: deadlineCol!==-1 ? cells[deadlineCol] : '',
+        responsible: respCol!==-1 ? cells[respCol] : '',
+        note: noteCol!==-1 ? cells[noteCol] : '',
+        kpi: kpiCol!==-1 ? cells[kpiCol] : '',
+        timeline: timeline,
+        latest: timeline.length ? timeline[timeline.length-1] : null
+      });
+    }
+
+    const timelineLabels = timelineCols.map(tc=>tc.label);
+    return {timeline_labels: timelineLabels, departments: departments.filter(d=>d.items.length)};
+  }
+
+  // ---------- State ----------
+  let DATA = JSON.parse(document.getElementById('dashboard-data').textContent);
+  let activeDept = 'all';
+  let searchTerm = '';
+  let lastSyncedAt = null;
+
+  // ---------- KPI helpers ----------
+  function deptKPI(dept){
+    if(!dept.items.length) return 0;
+    const sum = dept.items.reduce((a,it)=>a + classify(it).percent, 0);
+    return Math.round(sum / dept.items.length);
+  }
+  function overallKPI(){
+    const all = DATA.departments.flatMap(d=>d.items);
+    if(!all.length) return 0;
+    const sum = all.reduce((a,it)=>a + classify(it).percent, 0);
+    return Math.round(sum / all.length);
+  }
+
+  function shortName(name){
+    return name.trim().replace(/^งาน\s*/, '').replace(/\s+/g,' ');
+  }
+
+  // ---------- Rendering ----------
+  function renderHeader(){
+    const lastLabel = DATA.timeline_labels[DATA.timeline_labels.length - 1] || '-';
+    const totalItems = DATA.departments.reduce((a,d)=>a+d.items.length,0);
+    document.getElementById('metaBox').innerHTML = `
+      <div><b>รอบข้อมูลล่าสุด:</b> ${escapeHtml(lastLabel)}</div>
+      <div><b>รอบการติดตามทั้งหมด:</b> ${DATA.timeline_labels.length} ครั้ง</div>
+      <div><b>จำนวนฝ่ายงาน:</b> ${DATA.departments.length} ฝ่าย</div>
+      ${lastSyncedAt ? `<div><b>ซิงก์ล่าสุด:</b> ${escapeHtml(lastSyncedAt)}</div>` : ''}
+    `;
+    document.getElementById('genNote').textContent = `เรื่องทั้งหมด ${totalItems} รายการ`;
+  }
+
+  function renderOverview(){
+    const lastLabel = DATA.timeline_labels[DATA.timeline_labels.length - 1] || '-';
+    const totalItems = DATA.departments.reduce((a,d)=>a+d.items.length,0);
+    const updatedLatest = DATA.departments.reduce((a,d)=>a + d.items.filter(it=>it.latest && it.latest.label===lastLabel).length, 0);
+    const noReport = DATA.departments.reduce((a,d)=>a + d.items.filter(it=>!it.latest).length, 0);
+    const kpi = overallKPI();
+
+    document.getElementById('overview').innerHTML = `
+      <div class="kpi">
+        <div class="num">${totalItems}</div>
+        <div class="label">เรื่องที่ติดตามทั้งหมด</div>
+      </div>
+      <div class="kpi accent-navy">
+        <div class="num">${kpi}%</div>
+        <div class="label">ความคืบหน้าเฉลี่ยรวม (ประมาณการจากสถานะ)</div>
+      </div>
+      <div class="kpi accent-teal">
+        <div class="num">${updatedLatest}</div>
+        <div class="label">อัปเดตในการประชุมล่าสุด (${escapeHtml(lastLabel)})</div>
+      </div>
+      <div class="kpi accent-amber">
+        <div class="num">${noReport}</div>
+        <div class="label">ยังไม่เคยมีรายงานความคืบหน้า</div>
+      </div>
+    `;
+  }
+
+  function renderPills(){
+    const totalItems = DATA.departments.reduce((a,d)=>a+d.items.length,0);
+    const pillRow = document.getElementById('deptPills');
+    let html = `<button class="pill ${activeDept==='all'?'active':''}" data-dept="all">ทั้งหมด <span class="count">${totalItems}</span></button>`;
+    DATA.departments.forEach((d,i) => {
+      html += `<button class="pill ${activeDept===String(i)?'active':''}" data-dept="${i}">${escapeHtml(shortName(d.name))} <span class="count">${d.items.length}</span></button>`;
+    });
+    pillRow.innerHTML = html;
+    pillRow.querySelectorAll('.pill').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ activeDept = btn.dataset.dept; renderMain(); renderPills(); });
+    });
+  }
+
+  function renderTimelineDots(item, color){
+    return DATA.timeline_labels.map(lbl=>{
+      const entry = item.timeline.find(t=>t.label===lbl);
+      const cls = entry ? 'dot filled' : 'dot';
+      const tip = entry ? `${lbl}\n${entry.text}` : lbl;
+      return `<span class="${cls}" style="--dept-color:${color}" data-tip="${escapeHtml(tip)}"></span>`;
+    }).join('');
+  }
+
+  function renderCard(item, color, lastLabel){
+    const status = classify(item);
+    const stale = isStale(item, lastLabel);
+    const statusClass = status.key === 'done' ? 'status-done' : (status.key === 'none' ? 'status-none' : 'status-progress');
+
+    const metaBits = [];
+    if(item.responsible) metaBits.push(`<span><b>ผู้รับผิดชอบ</b> ${escapeHtml(item.responsible)}</span>`);
+    if(item.deadline) metaBits.push(`<span><b>กำหนดเวลา</b> ${escapeHtml(item.deadline)}</span>`);
+
+    const latestHtml = item.latest
+      ? `<div class="latest-block"><span class="latest-label">${escapeHtml(item.latest.label)}</span><div class="latest-text">${escapeHtml(item.latest.text)}</div>${stale ? `<div class="stale-flag">● ยังไม่อัปเดตในการประชุมล่าสุด</div>` : ''}</div>`
+      : `<div class="latest-block"><span class="latest-label">สถานะ</span><div class="latest-text">ยังไม่มีการรายงานความคืบหน้าในรอบการประชุมใดๆ</div></div>`;
+
+    const fullTimeline = item.timeline.length
+      ? item.timeline.map(t=>`<div class="tl-entry"><span class="tl-label">${escapeHtml(t.label)}</span><span class="tl-text">${escapeHtml(t.text)}</span></div>`).join('')
+      : '';
+
+    const extraFields = [];
+    if(item.action) extraFields.push(`<div><b>การดำเนินการ:</b> ${escapeHtml(item.action)}</div>`);
+    if(item.note) extraFields.push(`<div><b>หมายเหตุ:</b> ${escapeHtml(item.note)}</div>`);
+    if(item.kpi) extraFields.push(`<div><b>ความคืบหน้า KPI (ตามที่ระบุในชีท):</b> ${escapeHtml(item.kpi)}</div>`);
+
+    return `
+    <div class="task-card" style="--dept-color:${color}">
+      <div class="task-top">
+        <div>
+          <div class="task-no">${item.no ? '#'+escapeHtml(item.no) : ''}</div>
+          <div class="task-title">${escapeHtml(item.title)}</div>
+        </div>
+        <div class="status-tag ${statusClass}">${status.label} · ${status.percent}%</div>
+      </div>
+      ${metaBits.length ? `<div class="meta-line">${metaBits.join('')}</div>` : ''}
+      ${latestHtml}
+      <div class="timeline-dots">${renderTimelineDots(item, color)}</div>
+      ${extraFields.length || fullTimeline ? `
+      <button class="expand-btn" type="button">
+        ดูรายละเอียด / ประวัติทั้งหมด (${item.timeline.length} รอบ)
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="extra-fields">${extraFields.join('')}</div>
+      <div class="full-timeline">${fullTimeline}</div>
+      ` : ''}
+    </div>`;
+  }
+
+  function itemMatchesSearch(item){
+    if(!searchTerm) return true;
+    const hay = [item.title, item.responsible, item.action, item.note].join(' ').toLowerCase();
+    return hay.includes(searchTerm);
+  }
+
+  function renderMain(){
+    const lastLabel = DATA.timeline_labels[DATA.timeline_labels.length - 1] || '-';
+    const main = document.getElementById('mainContent');
+    let html = '';
+    let anyRendered = false;
+
+    DATA.departments.forEach((d, i) => {
+      if(activeDept !== 'all' && activeDept !== String(i)) return;
+      const items = d.items.filter(itemMatchesSearch);
+      if(items.length === 0) return;
+      anyRendered = true;
+      const color = DEPT_COLORS[i % DEPT_COLORS.length];
+      const kpi = deptKPI(d);
+      html += `
+      <div class="dept-section">
+        <div class="dept-head">
+          <span class="dept-dot" style="background:${color}"></span>
+          <h2>${escapeHtml(d.name.trim())}</h2>
+          <span class="dept-count">${items.length} เรื่อง</span>
+          <div class="dept-kpi-wrap">
+            <div class="progress-bar dept-kpi-bar"><div class="progress-fill" style="width:${kpi}%; --dept-color:${color}"></div></div>
+            <span class="dept-kpi-num">${kpi}%</span>
+          </div>
+        </div>
+        <div class="card-grid">
+          ${items.map(it => renderCard(it, color, lastLabel)).join('')}
+        </div>
+      </div>`;
+    });
+
+    if(!anyRendered){
+      html = `<div class="empty-state">ไม่พบรายการที่ตรงกับคำค้นหา</div>`;
+    }
+
+    main.innerHTML = html;
+    main.querySelectorAll('.expand-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        btn.closest('.task-card').classList.toggle('expanded');
+      });
+    });
+  }
+
+  function renderAll(){
+    renderHeader();
+    renderOverview();
+    renderPills();
+    renderMain();
+  }
+
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    searchTerm = e.target.value.trim().toLowerCase();
+    renderMain();
+  });
+
+  // ---------- Connection status ----------
+  function setConn(state, text){
+    const line = document.getElementById('connLine');
+    const dot = line.querySelector('.conn-dot');
+    dot.className = 'conn-dot' + (state ? ' ' + state : '');
+    line.querySelector('span:last-child').textContent = text;
+  }
+
+  // ---------- Live sync ----------
+  async function syncLive(manual){
+    const btn = document.getElementById('syncBtn');
+    btn.disabled = true;
+    btn.classList.add('spinning');
+    setConn('loading', 'กำลังซิงก์ข้อมูล...');
+    try{
+      const res = await fetch(GVIZ_URL, {cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const csvText = await res.text();
+      const rows = parseCSV(csvText);
+      const fresh = buildDataFromRows(rows);
+      if(!fresh.departments.length) throw new Error('ไม่พบข้อมูลรายการในชีท');
+      DATA = fresh;
+      lastSyncedAt = new Date().toLocaleString('th-TH', {dateStyle:'medium', timeStyle:'short'});
+      setConn('ok', 'เชื่อมต่อ Google Sheets สำเร็จ · ' + lastSyncedAt);
+      renderAll();
+    } catch(err){
+      setConn('err', 'ซิงก์ไม่สำเร็จ — แสดงข้อมูลชุดล่าสุดที่มีอยู่ (' + err.message + ')');
+      if(manual){
+        // keep current DATA, just report the error via connection line above
+      }
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('spinning');
+    }
+  }
+
+  document.getElementById('syncBtn').addEventListener('click', ()=>syncLive(true));
+
+  // ---------- Init ----------
+  renderAll();
+  syncLive(false); // silent auto-sync on load; falls back to embedded snapshot on failure
+})();
+
+</script>
+</body>
+</html>
