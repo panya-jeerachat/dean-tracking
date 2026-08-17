@@ -494,16 +494,29 @@
       const r = rows[i];
       const cells = [];
       for(let j=0; j<width; j++){ cells.push(normCell(r[j])); }
-      const nonEmptyIdx = cells.map((c,idx)=>c?idx:-1).filter(idx=>idx!==-1);
 
-      if(nonEmptyIdx.length === 1 && cells[nonEmptyIdx[0]].includes('ฝ่าย') && cells[nonEmptyIdx[0]].startsWith('งาน')){
-        current = {name: cells[nonEmptyIdx[0]], items: []};
+      const title = titleCol!==-1 ? cells[titleCol] : '';
+      const no = noCol!==-1 ? cells[noCol] : '';
+
+      // Department header row: title is empty, and a department-name cell is present.
+      // Keyed off the actual "ที่" column (or, if that column wasn't detected, scanned
+      // across the row) rather than requiring the whole row to be otherwise blank —
+      // more tolerant of hidden columns / formatting artifacts on the live sheet.
+      let deptName = '';
+      if(!title){
+        if(no && no.includes('ฝ่าย') && no.startsWith('งาน')){
+          deptName = no;
+        } else {
+          const found = cells.find(c => c.includes('ฝ่าย') && c.startsWith('งาน'));
+          if(found) deptName = found;
+        }
+      }
+      if(deptName){
+        current = {name: deptName, items: []};
         departments.push(current);
         continue;
       }
 
-      const title = titleCol!==-1 ? cells[titleCol] : '';
-      const no = noCol!==-1 ? cells[noCol] : '';
       if(!title && !no) continue; // blank spacer row
       if(!title) continue; // no title -> nothing meaningful to show
 
