@@ -377,6 +377,10 @@
   }
 
   // ---------- Robust CSV parser (handles quoted fields, embedded newlines/commas) ----------
+  // หมายเหตุ: ตัวแยกวิเคราะห์นี้ถือว่าเครื่องหมาย " เป็นตัวเริ่ม/ปิดฟิลด์ก็ต่อเมื่ออยู่ที่ตำแหน่ง
+  // เริ่มต้นของฟิลด์เท่านั้น (มาตรฐาน RFC4180) — ถ้าพบ " กลางข้อความ (เช่น เครื่องหมายนิ้ว
+  // หรือคำพูดที่พิมพ์ในข้อความประชุม) จะถือเป็นตัวอักษรธรรมดา ไม่ใช่ตัวเปิดฟิลด์ใหม่
+  // ป้องกันปัญหาข้อมูลหลายแถวถูกกลืนรวมเป็นแถวเดียวเมื่อเจอเครื่องหมาย " ที่ไม่ได้ตั้งใจ
   function parseCSV(text){
     text = text.replace(/^\uFEFF/, ''); // strip UTF-8 BOM that Google's CSV export often prepends
     const rows = [];
@@ -393,7 +397,7 @@
           field += c;
         }
       } else {
-        if(c === '"'){ inQuotes = true; }
+        if(c === '"' && field === ''){ inQuotes = true; } // only a true field-start quote toggles quote mode
         else if(c === ','){ row.push(field); field = ''; }
         else if(c === '\r'){ /* skip */ }
         else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
@@ -410,16 +414,22 @@
 
   // ---------- Build dashboard data from raw CSV rows, detecting columns by header text ----------
   function buildDataFromRows(rows){
-    // find header row: a row containing both 'ที่' and 'เรื่อง' as exact-normalized cells
+    // find header row: primarily key off 'เรื่อง' (title column), confirmed by a nearby
+    // supporting column header — more robust than requiring 'ที่' as an exact standalone
+    // cell, since merged/grouped columns can occasionally shift its exact text.
     let headerRowIdx = -1;
     const scanLimit = Math.min(rows.length, 30);
+    const supportHeaders = ['การดำเนินการ','กำหนดเวลา','ผู้รับผิดชอบหลัก','หมายเหตุ','สถานะ'];
     for(let i=0; i<scanLimit; i++){
       const cells = rows[i].map(normCell);
-      if(cells.includes('ที่') && cells.includes('เรื่อง')){ headerRowIdx = i; break; }
+      const hasTitle = cells.includes('เรื่อง');
+      const hasSupport = cells.some(c => supportHeaders.includes(c));
+      if(hasTitle && hasSupport){ headerRowIdx = i; break; }
     }
     if(headerRowIdx === -1){
       const preview = rows.slice(0, 4).map(r => r.slice(0,5).map(normCell).join(' | ')).join(' // ');
-      throw new Error('ไม่พบแถวหัวตาราง (ที่/เรื่อง) — ตัวอย่างข้อมูลที่ได้รับ: ' + (preview || '(ว่างเปล่า)'));
+      console.error('[dashboard] header row not found. First rows preview:', preview);
+      throw new Error('ไม่พบแถวหัวตาราง');
     }
 
     const header = rows[headerRowIdx].map(c => normCell(c).replace(/^"+|"+$/g,'').replace(/\s+/g,' '));
@@ -738,10 +748,8 @@
       setConn('ok', 'เชื่อมต่อ Google Sheets สำเร็จ · ' + lastSyncedAt);
       renderAll();
     } catch(err){
-      setConn('err', 'ซิงก์ไม่สำเร็จ — แสดงข้อมูลชุดล่าสุดที่มีอยู่ (' + err.message + ')');
-      if(manual){
-        // keep current DATA, just report the error via connection line above
-      }
+      console.error('[dashboard] sync failed:', err);
+      setConn('err', 'ไม่สามารถซิงก์ข้อมูลสดได้ในขณะนี้ — แสดงข้อมูลชุดล่าสุดที่มีอยู่');
     } finally {
       btn.disabled = false;
       btn.classList.remove('spinning');
