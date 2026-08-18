@@ -50,19 +50,13 @@
     color:var(--slate);
   }
 
-  /* ---------- Header ---------- */
+  /* ---------- Header (normal flow — not sticky, so it scrolls away and frees room) ---------- */
   header.top{
-    position:sticky; top:0; z-index:40;
-    background:rgba(242,247,252,0.92);
-    backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line);
   }
   .top-inner{
     max-width:1180px; margin:0 auto;
     padding:22px 24px 16px;
-  }
-  .top-row{
-    display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap;
   }
   h1{
     font-family:'Kanit',sans-serif;
@@ -75,19 +69,37 @@
   .subtitle{
     color:var(--ink-soft);
     font-size:14.5px;
-    max-width:560px;
+    max-width:640px;
   }
-  .meta-box{
-    text-align:left;
-    font-family:'JetBrains Mono',monospace;
-    font-size:11.5px;
-    color:var(--slate);
-    border-left:2px solid var(--line);
-    padding-left:12px;
-    min-width:190px;
+
+  /* Sync button + connection status combined onto one row to save space */
+  .sync-row{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    margin-top:14px;
   }
-  .meta-box div{margin-bottom:3px;}
-  .meta-box b{color:var(--ink-soft); font-weight:600;}
+  .conn-line{
+    display:flex; align-items:center; gap:6px;
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate);
+  }
+  .conn-dot{width:7px; height:7px; border-radius:50%; background:#B7CBDD; flex-shrink:0;}
+  .conn-dot.ok{background:var(--teal);}
+  .conn-dot.err{background:var(--burgundy);}
+  .conn-dot.loading{background:var(--amber); animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+
+  .sync-btn{
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:'Sarabun',sans-serif; font-size:13px; font-weight:600;
+    padding:7px 13px; border-radius:9px;
+    border:1px solid var(--ink); background:var(--ink); color:#fff;
+    cursor:pointer; white-space:nowrap;
+    transition:opacity .15s;
+  }
+  .sync-btn:hover{opacity:.88;}
+  .sync-btn:disabled{opacity:.55; cursor:default;}
+  .sync-btn svg{transition:transform .6s linear;}
+  .sync-btn.spinning svg{animation:spin 0.8s linear infinite;}
+  @keyframes spin{ to{ transform:rotate(360deg); } }
 
   .controls{
     display:flex; gap:10px; align-items:center; flex-wrap:wrap;
@@ -110,9 +122,7 @@
   .search-wrap input:focus{border-color:var(--dept-a);}
   .search-wrap svg{position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:.45;}
 
-  .pill-row{display:flex; gap:8px; flex-wrap:wrap;}
-
-  /* ---------- View tabs (งานติดตาม / งานที่แล้วเสร็จ) ---------- */
+  /* ---------- View tabs (งานติดตาม / งานที่แล้วเสร็จ) — normal flow ---------- */
   .view-tabs{
     display:flex; gap:6px; margin-top:18px;
     background:var(--line-soft); padding:4px; border-radius:12px; width:fit-content;
@@ -126,6 +136,20 @@
   .view-btn:hover{color:var(--ink);}
   .view-btn.active{background:var(--card); color:var(--ink); box-shadow:var(--shadow);}
   .view-icon{font-size:14px;}
+
+  /* ---------- Department pills — the ONLY sticky element, stays pinned while scrolling ---------- */
+  .pill-bar{
+    position:sticky; top:0; z-index:40;
+    background:rgba(242,247,252,0.95);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 2px 10px -6px rgba(15,42,71,0.15);
+  }
+  .pill-bar-inner{
+    max-width:1180px; margin:0 auto; padding:12px 24px;
+  }
+  .pill-row{display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;}
+  .pill-row::-webkit-scrollbar{display:none;}
   .pill{
     font-family:'Sarabun',sans-serif;
     font-size:13.5px;
@@ -137,6 +161,7 @@
     color:var(--ink-soft);
     cursor:pointer;
     white-space:nowrap;
+    flex-shrink:0;
     transition:background .15s, color .15s, border-color .15s;
   }
   .pill:hover{border-color:#B7CBDD;}
@@ -148,7 +173,9 @@
   /* ---------- Overview KPIs ---------- */
   .overview{
     max-width:1180px; margin:22px auto 0; padding:0 24px;
-    display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+  }
+  .kpi-row{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
   }
   .kpi{
     background:var(--card); border:1px solid var(--line-soft); border-radius:var(--radius);
@@ -161,6 +188,20 @@
   .kpi .label{margin-top:8px; font-size:12.5px; color:var(--slate);}
   .kpi.accent-teal .num{color:var(--teal);}
   .kpi.accent-amber .num{color:var(--amber);}
+  .kpi.accent-navy .num{color:var(--dept-a);}
+
+  /* Status breakdown: stacked bar + legend, shows how many items sit at each of the 5 levels */
+  .status-breakdown{
+    background:var(--card); border:1px solid var(--line-soft); border-radius:var(--radius);
+    padding:16px 18px; box-shadow:var(--shadow); margin-top:12px;
+  }
+  .sb-title{font-size:12.5px; color:var(--slate); margin-bottom:10px;}
+  .sb-bar{display:flex; width:100%; height:10px; border-radius:999px; overflow:hidden; background:var(--line-soft);}
+  .sb-seg{height:100%;}
+  .sb-legend{display:flex; flex-wrap:wrap; gap:10px 18px; margin-top:12px;}
+  .sb-item{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-soft);}
+  .sb-dot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+  .sb-item b{font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--ink);}
 
   /* ---------- Main ---------- */
   main{max-width:1180px; margin:0 auto; padding:28px 24px 80px;}
@@ -263,34 +304,7 @@
     text-align:center; padding:60px 20px; color:var(--slate); font-size:14px;
   }
 
-  /* ---------- Sync + connection status ---------- */
-  .sync-btn{
-    display:inline-flex; align-items:center; gap:7px;
-    font-family:'Sarabun',sans-serif; font-size:13.5px; font-weight:600;
-    padding:8px 14px; border-radius:10px;
-    border:1px solid var(--ink); background:var(--ink); color:#fff;
-    cursor:pointer; white-space:nowrap;
-    transition:opacity .15s;
-  }
-  .sync-btn:hover{opacity:.88;}
-  .sync-btn:disabled{opacity:.55; cursor:default;}
-  .sync-btn svg{transition:transform .6s linear;}
-  .sync-btn.spinning svg{animation:spin 0.8s linear infinite;}
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-
-  .conn-line{
-    display:flex; align-items:center; gap:6px;
-    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate);
-    margin-top:6px;
-  }
-  .conn-dot{width:7px; height:7px; border-radius:50%; background:#B7CBDD; flex-shrink:0;}
-  .conn-dot.ok{background:var(--teal);}
-  .conn-dot.err{background:var(--burgundy);}
-  .conn-dot.loading{background:var(--amber); animation:pulse 1s ease-in-out infinite;}
-  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
-
-  /* ---------- KPI / progress bars ---------- */
-  .kpi.accent-navy .num{color:var(--dept-a);}
+  /* ---------- KPI / progress bars (per-department bar within card grid headers) ---------- */
   .progress-bar{
     width:100%; height:6px; border-radius:999px; background:var(--line-soft); overflow:hidden;
   }
@@ -302,35 +316,8 @@
   }
   .dept-kpi-bar{width:90px;}
 
-  /* ---------- View tabs (งานติดตาม / งานที่แล้วเสร็จ) ---------- */
-  .view-tabs{
-    display:flex; gap:4px; margin-top:16px;
-    background:#EAE8DE; padding:4px; border-radius:12px; width:fit-content;
-  }
-  .view-tab{
-    font-family:'Kanit',sans-serif; font-weight:600; font-size:13.5px;
-    padding:9px 18px; border-radius:9px; border:none; background:none; cursor:pointer;
-    color:var(--ink-soft); display:flex; align-items:center; gap:7px;
-    transition:background .15s, color .15s;
-  }
-  .view-tab .vt-count{
-    font-family:'JetBrains Mono',monospace; font-weight:500; font-size:11px;
-    background:rgba(24,35,56,0.08); padding:1px 7px; border-radius:999px;
-  }
-  .view-tab.active{background:var(--card); color:var(--ink); box-shadow:var(--shadow);}
-  .view-tab.active .vt-count{background:var(--teal-bg); color:var(--teal);}
-
-  footer{
-    max-width:1180px; margin:0 auto; padding:24px 24px 50px;
-    border-top:1px solid var(--line);
-    font-size:12px; color:var(--slate);
-    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
-  }
-
   @media (max-width:640px){
-    .overview{grid-template-columns:repeat(2,1fr);}
     h1{font-size:21px;}
-    .meta-box{border-left:none; padding-left:0; border-top:1px solid var(--line); padding-top:8px; width:100%;}
   }
 </style>
 </head>
@@ -338,20 +325,16 @@
 
 <header class="top">
   <div class="top-inner">
-    <div class="top-row">
-      <div>
-        <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
-        <h1>แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
-        <div class="subtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
-      </div>
-      <div>
-        <div class="meta-box" id="metaBox"></div>
-        <button class="sync-btn" id="syncBtn" type="button">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          ซิงก์ข้อมูลล่าสุด
-        </button>
-        <div class="conn-line" id="connLine"><span class="conn-dot"></span><span>ยังไม่เชื่อมต่อ</span></div>
-      </div>
+    <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
+    <h1>แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
+    <div class="subtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
+
+    <div class="sync-row">
+      <button class="sync-btn" id="syncBtn" type="button">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        ซิงก์ข้อมูลล่าสุด
+      </button>
+      <div class="conn-line" id="connLine"><span class="conn-dot"></span><span>ยังไม่เชื่อมต่อ</span></div>
     </div>
 
     <div class="view-tabs" id="viewTabs"></div>
@@ -361,12 +344,17 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" type="text" placeholder="ค้นหาเรื่อง / ผู้รับผิดชอบ...">
       </div>
-      <div class="pill-row" id="deptPills"></div>
     </div>
   </div>
 </header>
 
 <section class="overview" id="overview"></section>
+
+<div class="pill-bar">
+  <div class="pill-bar-inner">
+    <div class="pill-row" id="deptPills"></div>
+  </div>
+</div>
 
 <main id="mainContent"></main>
 
@@ -376,7 +364,7 @@
   // Build stamp — shown in the meta box so it's easy to confirm the browser/CDN is
   // serving this exact file and not a cached older copy (helpful when GitHub Pages
   // or the browser caches the HTML itself, separately from the live data sync).
-  const BUILD_ID = '2026-08-18-03-dept-col-blue-theme';
+  const BUILD_ID = '2026-08-18-04-status-breakdown-sticky-pills';
 
   // ---------- Data sources: two tabs within the same workbook ----------
   // "งานติดตาม" = active tracking sheet (gid 0). "งานที่แล้วเสร็จ" = completed-work
@@ -628,41 +616,65 @@
 
   // ---------- Rendering ----------
   function renderHeader(){
+    // Diagnostic info intentionally not shown to viewers — logged to console only.
     const lastLabel = DATA.timeline_labels[DATA.timeline_labels.length - 1] || '-';
-    document.getElementById('metaBox').innerHTML = `
-      <div><b>มุมมอง:</b> ${escapeHtml(VIEWS[currentView].label)}</div>
-      <div><b>รอบข้อมูลล่าสุด:</b> ${escapeHtml(lastLabel)}</div>
-      <div><b>รอบการติดตามทั้งหมด:</b> ${DATA.timeline_labels.length} ครั้ง</div>
-      <div><b>จำนวนฝ่ายงาน:</b> ${DATA.departments.length} ฝ่าย</div>
-      ${lastSyncedAt ? `<div><b>ซิงก์ล่าสุด:</b> ${escapeHtml(lastSyncedAt)}</div>` : ''}
-      <div style="opacity:.5; margin-top:4px;">build ${BUILD_ID}</div>
+    console.log(`[dashboard] build ${BUILD_ID} · view ${currentView} · data round ${lastLabel} · ${DATA.timeline_labels.length} rounds · ${DATA.departments.length} depts` + (lastSyncedAt ? ` · synced ${lastSyncedAt}` : ''));
+  }
+
+  const STATUS_ORDER = ['none','track','progress','near','done'];
+  const STATUS_COLORS = {
+    none:'#9AAAB8', track:'#D9A441', progress:'#C97F2A', near:'#5FAE8C', done:'#1E8065'
+  };
+
+  function renderStatusBreakdown(){
+    const all = DATA.departments.flatMap(d=>d.items);
+    const counts = {none:0, track:0, progress:0, near:0, done:0, unknown:0};
+    all.forEach(it => {
+      const c = classify(it);
+      if(counts[c.key] !== undefined) counts[c.key]++;
+      else counts.unknown++;
+    });
+    const total = all.length || 1;
+    const remaining = total - counts.done - counts.unknown;
+
+    const segments = STATUS_ORDER.map(key => {
+      const n = counts[key];
+      if(!n) return '';
+      const pct = (n/total*100).toFixed(2);
+      return `<span class="sb-seg" style="width:${pct}%; background:${STATUS_COLORS[key]}"></span>`;
+    }).join('');
+
+    const legend = STATUS_ORDER.map(key => {
+      const n = counts[key];
+      const label = Object.values(STATUS_MAP).find(s=>s.key===key)?.label || key;
+      return `<div class="sb-item"><span class="sb-dot" style="background:${STATUS_COLORS[key]}"></span>${escapeHtml(label)}: <b>${n}</b></div>`;
+    }).join('');
+
+    return `
+      <div class="status-breakdown">
+        <div class="sb-title">สรุปสถานะรายเรื่อง — เหลืองาน<b style="color:var(--ink)">${remaining}</b>เรื่องที่ต้องกำกับติดตามต่อ จากทั้งหมด ${total} เรื่อง (สำเร็จแล้ว ${counts.done} เรื่อง)</div>
+        <div class="sb-bar">${segments}</div>
+        <div class="sb-legend">${legend}</div>
+      </div>
     `;
   }
 
   function renderOverview(){
-    const lastLabel = DATA.timeline_labels[DATA.timeline_labels.length - 1] || '-';
     const totalItems = DATA.departments.reduce((a,d)=>a+d.items.length,0);
-    const updatedLatest = DATA.departments.reduce((a,d)=>a + d.items.filter(it=>it.latest && it.latest.label===lastLabel).length, 0);
-    const noReport = DATA.departments.reduce((a,d)=>a + d.items.filter(it=>!it.latest).length, 0);
     const kpi = overallKPI();
 
     document.getElementById('overview').innerHTML = `
-      <div class="kpi">
-        <div class="num">${totalItems}</div>
-        <div class="label">เรื่องทั้งหมดในมุมมองนี้</div>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="num">${totalItems}</div>
+          <div class="label">เรื่องทั้งหมดในมุมมองนี้</div>
+        </div>
+        <div class="kpi accent-navy">
+          <div class="num">${kpi}%</div>
+          <div class="label">ความคืบหน้าเฉลี่ยรวม (ประมาณการจากสถานะ)</div>
+        </div>
       </div>
-      <div class="kpi accent-navy">
-        <div class="num">${kpi}%</div>
-        <div class="label">ความคืบหน้าเฉลี่ยรวม (ประมาณการจากสถานะ)</div>
-      </div>
-      <div class="kpi accent-teal">
-        <div class="num">${updatedLatest}</div>
-        <div class="label">อัปเดตในการประชุมล่าสุด (${escapeHtml(lastLabel)})</div>
-      </div>
-      <div class="kpi accent-amber">
-        <div class="num">${noReport}</div>
-        <div class="label">ยังไม่เคยมีรายงานความคืบหน้า</div>
-      </div>
+      ${renderStatusBreakdown()}
     `;
   }
 
