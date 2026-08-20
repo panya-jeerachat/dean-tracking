@@ -200,6 +200,9 @@
   .sb-bar{display:flex; width:100%; height:10px; border-radius:999px; overflow:hidden; background:var(--line-soft);}
   .sb-seg{height:100%;}
   .sb-legend{display:flex; flex-wrap:wrap; gap:10px 18px; margin-top:12px;}
+  .sb-legend.sb-outcome{margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);}
+  .sb-item.sb-urgent{color:var(--burgundy); font-weight:600;}
+  .sb-item.sb-urgent b{color:var(--burgundy);}
   .sb-item{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--ink-soft);}
   .sb-dot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
   .sb-item b{font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--ink);}
@@ -418,7 +421,7 @@
   // Build stamp — shown in the meta box so it's easy to confirm the browser/CDN is
   // serving this exact file and not a cached older copy (helpful when GitHub Pages
   // or the browser caches the HTML itself, separately from the live data sync).
-  const BUILD_ID = '2026-08-19-07-fiscal-year-date-filter';
+  const BUILD_ID = '2026-08-20-09-overdue-inprogress-kpi';
 
   // ---------- Data sources: two tabs within the same workbook (no per-year sheets) ----------
   // "งานติดตาม" = active tracking sheet (gid 0). "งานที่แล้วเสร็จ" = completed-work
@@ -791,11 +794,29 @@
       return `<div class="sb-item"><span class="sb-dot" style="background:${STATUS_COLORS[key]}"></span>${escapeHtml(label)}: <b>${n}</b></div>`;
     }).join('');
 
+    // Outcome summary: on-time vs late completions, plus in-progress (and, within
+    // in-progress, how many are already overdue) — a different cut than the 5-level
+    // status breakdown above. Kept as one slim extra row in the same card, not a
+    // separate section, since this is a summary aside — not the main focus of the page.
+    const doneItems = all.filter(it => classify(it).key === 'done');
+    const doneOnTime = doneItems.filter(it => it.overdueDays === null || it.overdueDays <= 0).length;
+    const doneLate = doneItems.filter(it => it.overdueDays !== null && it.overdueDays > 0).length;
+    const inProgressItems = all.filter(it => classify(it).key !== 'done');
+    const inProgress = inProgressItems.length;
+    const inProgressOverdue = inProgressItems.filter(it => it.overdueDays !== null && it.overdueDays > 0).length;
+    const outcomeRow = `
+      <div class="sb-item"><span class="sb-dot" style="background:${STATUS_COLORS.done}"></span>สำเร็จตามกำหนด: <b>${doneOnTime}</b></div>
+      <div class="sb-item"><span class="sb-dot" style="background:var(--burgundy)"></span>สำเร็จเกินกำหนด: <b>${doneLate}</b></div>
+      <div class="sb-item"><span class="sb-dot" style="background:${STATUS_COLORS.progress}"></span>กำลังดำเนินการ: <b>${inProgress}</b></div>
+      <div class="sb-item sb-urgent"><span class="sb-dot" style="background:var(--burgundy)"></span>กำลังดำเนินการเกินกำหนด: <b>${inProgressOverdue}</b></div>
+    `;
+
     return `
       <div class="status-breakdown">
         <div class="sb-title">สรุปสถานะรายเรื่อง — เหลืองาน<b style="color:var(--ink)">${remaining}</b>เรื่องที่ต้องกำกับติดตามต่อ จากทั้งหมด ${total} เรื่อง (สำเร็จแล้ว ${counts.done} เรื่อง)</div>
         <div class="sb-bar">${segments}</div>
         <div class="sb-legend">${legend}</div>
+        <div class="sb-legend sb-outcome">${outcomeRow}</div>
       </div>
     `;
   }
