@@ -240,16 +240,18 @@
 
   .dept-section{margin-top:36px;}
   .dept-head{
-    display:flex; align-items:baseline; gap:10px; margin-bottom:14px;
+    display:flex; align-items:baseline; flex-wrap:wrap; gap:8px 10px; margin-bottom:14px;
     padding-bottom:10px; border-bottom:1px solid var(--line);
   }
   .dept-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0; margin-bottom:2px;}
   .dept-head h2{
     font-family:'Kanit',sans-serif; font-weight:600; font-size:17px; margin:0;
     color:var(--ink);
+    flex:1 1 240px; min-width:0; overflow-wrap:break-word;
   }
   .dept-head .dept-count{
     font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--slate);
+    flex-shrink:0;
   }
 
   .card-grid{
@@ -261,6 +263,7 @@
     padding:16px 17px; box-shadow:var(--shadow);
     display:flex; flex-direction:column; gap:10px;
     border-left:3px solid var(--dept-color, var(--ink));
+    min-width:0; overflow-wrap:break-word;
   }
   .task-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start;}
   .task-no{
@@ -269,6 +272,7 @@
   .task-title{
     font-family:'Kanit',sans-serif; font-weight:600; font-size:15px; color:var(--ink);
     margin:2px 0 0; line-height:1.35;
+    overflow-wrap:break-word;
   }
   .status-tag{
     flex-shrink:0;
@@ -299,7 +303,7 @@
   .card-dept-tag .dept-dot{width:7px; height:7px; border-radius:50%; margin-bottom:0;}
 
   .meta-line{
-    font-size:12.5px; color:var(--slate); display:flex; flex-wrap:wrap; gap:4px 14px;
+    font-size:12.5px; color:var(--slate); display:flex; flex-wrap:wrap; gap:4px 14px; overflow-wrap:break-word;
   }
   .meta-line span b{color:var(--ink-soft); font-weight:600;}
 
@@ -310,7 +314,7 @@
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--slate);
     text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; display:block;
   }
-  .latest-block .latest-text{font-size:13.5px; color:var(--ink-soft); white-space:pre-line;}
+  .latest-block .latest-text{font-size:13.5px; color:var(--ink-soft); white-space:pre-line; overflow-wrap:break-word;}
   .stale-flag{
     display:inline-block; margin-top:6px; font-size:11px; color:var(--burgundy);
     font-weight:600;
@@ -344,7 +348,7 @@
   .full-timeline .tl-entry .tl-label{
     font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--slate); display:block; margin-bottom:2px;
   }
-  .full-timeline .tl-entry .tl-text{color:var(--ink-soft); white-space:pre-line;}
+  .full-timeline .tl-entry .tl-text{color:var(--ink-soft); white-space:pre-line; overflow-wrap:break-word;}
   .extra-fields{font-size:12px; color:var(--slate); border-top:1px dashed var(--line); padding-top:8px; margin-top:2px; display:none; flex-direction:column; gap:4px;}
   .task-card.expanded .extra-fields{display:flex;}
   .extra-fields b{color:var(--ink-soft);}
@@ -358,7 +362,7 @@
     width:100%; height:6px; border-radius:999px; background:var(--line-soft); overflow:hidden;
   }
   .progress-fill{height:100%; border-radius:999px; background:var(--dept-color, var(--ink)); transition:width .4s ease;}
-  .dept-kpi-wrap{display:flex; align-items:center; gap:8px; margin-left:auto;}
+  .dept-kpi-wrap{display:flex; align-items:center; gap:8px; margin-left:auto; flex-shrink:0;}
   .dept-kpi-num{
     font-family:'JetBrains Mono',monospace; font-weight:600; font-size:12.5px; color:var(--ink-soft);
     min-width:34px; text-align:right;
@@ -421,7 +425,7 @@
   // Build stamp — shown in the meta box so it's easy to confirm the browser/CDN is
   // serving this exact file and not a cached older copy (helpful when GitHub Pages
   // or the browser caches the HTML itself, separately from the live data sync).
-  const BUILD_ID = '2026-08-20-09-overdue-inprogress-kpi';
+  const BUILD_ID = '2026-08-20-10-ontime-kpi-overflow-fix';
 
   // ---------- Data sources: two tabs within the same workbook (no per-year sheets) ----------
   // "งานติดตาม" = active tracking sheet (gid 0). "งานที่แล้วเสร็จ" = completed-work
@@ -804,10 +808,12 @@
     const inProgressItems = all.filter(it => classify(it).key !== 'done');
     const inProgress = inProgressItems.length;
     const inProgressOverdue = inProgressItems.filter(it => it.overdueDays !== null && it.overdueDays > 0).length;
+    const inProgressOnTime = inProgress - inProgressOverdue;
     const outcomeRow = `
       <div class="sb-item"><span class="sb-dot" style="background:${STATUS_COLORS.done}"></span>สำเร็จตามกำหนด: <b>${doneOnTime}</b></div>
       <div class="sb-item"><span class="sb-dot" style="background:var(--burgundy)"></span>สำเร็จเกินกำหนด: <b>${doneLate}</b></div>
       <div class="sb-item"><span class="sb-dot" style="background:${STATUS_COLORS.progress}"></span>กำลังดำเนินการ: <b>${inProgress}</b></div>
+      <div class="sb-item"><span class="sb-dot" style="background:${STATUS_COLORS.near}"></span>ดำเนินการอยู่ในช่วงเวลา: <b>${inProgressOnTime}</b></div>
       <div class="sb-item sb-urgent"><span class="sb-dot" style="background:var(--burgundy)"></span>กำลังดำเนินการเกินกำหนด: <b>${inProgressOverdue}</b></div>
     `;
 
