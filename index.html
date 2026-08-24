@@ -149,8 +149,7 @@
   .pill-bar-inner{
     max-width:1180px; margin:0 auto; padding:12px 24px;
   }
-  .pill-row{display:flex; gap:8px; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;}
-  .pill-row::-webkit-scrollbar{display:none;}
+  .pill-row{display:flex; gap:8px; flex-wrap:wrap;}
   .pill{
     font-family:'Sarabun',sans-serif;
     font-size:13.5px;
@@ -425,7 +424,7 @@
   // Build stamp — shown in the meta box so it's easy to confirm the browser/CDN is
   // serving this exact file and not a cached older copy (helpful when GitHub Pages
   // or the browser caches the HTML itself, separately from the live data sync).
-  const BUILD_ID = '2026-08-24-11-fuzzy-headers-date-sorted-meetings';
+  const BUILD_ID = '2026-08-24-12-pill-wrap';
 
   // ---------- Data sources: two tabs within the same workbook (no per-year sheets) ----------
   // "งานติดตาม" = active tracking sheet (gid 0). "งานที่แล้วเสร็จ" = completed-work
