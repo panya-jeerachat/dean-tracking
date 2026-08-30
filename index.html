@@ -77,6 +77,37 @@
     display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     margin-top:14px;
   }
+  .admin-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'Sarabun',sans-serif; font-size:12.5px; font-weight:600;
+    padding:7px 12px; border-radius:9px;
+    border:1px solid var(--line); background:var(--card); color:var(--ink-soft);
+    cursor:pointer; white-space:nowrap; text-decoration:none;
+    margin-left:auto;
+    transition:border-color .15s, color .15s;
+  }
+  .admin-link:hover{border-color:var(--dept-a); color:var(--dept-a);}
+
+  .qr-row{
+    display:flex; justify-content:flex-end;
+    margin-top:10px;
+  }
+  .qr-box{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:8px 12px 8px 8px; border-radius:11px;
+    border:1px solid var(--line); background:var(--card);
+    text-decoration:none; box-shadow:var(--shadow);
+    transition:border-color .15s;
+  }
+  .qr-box:hover{border-color:var(--dept-a);}
+  .qr-img{display:block; border-radius:6px; background:#fff;}
+  .qr-caption{display:flex; flex-direction:column; gap:2px;}
+  .qr-caption-title{
+    font-family:'Kanit',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink);
+  }
+  .qr-caption-sub{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--slate);
+  }
   .conn-line{
     display:flex; align-items:center; gap:6px;
     font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate);
@@ -137,6 +168,14 @@
   .view-btn:hover{color:var(--ink);}
   .view-btn.active{background:var(--card); color:var(--ink); box-shadow:var(--shadow);}
   .view-icon{font-size:14px;}
+  .view-tab-group{display:flex; align-items:center; gap:2px;}
+  .view-sheet-link{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:7px;
+    color:var(--slate); text-decoration:none; flex-shrink:0;
+    transition:background .15s, color .15s;
+  }
+  .view-sheet-link:hover{background:var(--card); color:var(--dept-a);}
 
   /* ---------- Department pills — the ONLY sticky element, stays pinned while scrolling ---------- */
   .pill-bar{
@@ -387,6 +426,20 @@
         ซิงก์ข้อมูลล่าสุด
       </button>
       <div class="conn-line" id="connLine"><span class="conn-dot"></span><span>ยังไม่เชื่อมต่อ</span></div>
+      <a class="admin-link" href="https://script.google.com/a/macros/msu.ac.th/s/AKfycbzUSYybLKzS08371SFqokcmNbl2X-NeRU2q7madB5Eg9ng11OW2aVWI94rpBANJYU9R/exec" target="_blank" rel="noopener noreferrer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        เข้าสู่ระบบผู้ดูแล
+      </a>
+    </div>
+
+    <div class="qr-row">
+      <a class="qr-box" href="https://panya-jeerachat.github.io/dean-tracking/" target="_blank" rel="noopener noreferrer" title="เปิดแดชบอร์ดสาธารณะ">
+        <img class="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&margin=6&data=https%3A%2F%2Fpanya-jeerachat.github.io%2Fdean-tracking%2F" alt="QR Code เข้าสู่แดชบอร์ด" width="88" height="88" loading="lazy">
+        <div class="qr-caption">
+          <span class="qr-caption-title">สแกนเพื่อร่วมดูข้อมูล</span>
+          <span class="qr-caption-sub">panya-jeerachat.github.io/dean-tracking</span>
+        </div>
+      </a>
     </div>
 
     <div class="view-tabs" id="yearTabs"></div>
@@ -424,15 +477,15 @@
   // Build stamp — shown in the meta box so it's easy to confirm the browser/CDN is
   // serving this exact file and not a cached older copy (helpful when GitHub Pages
   // or the browser caches the HTML itself, separately from the live data sync).
-  const BUILD_ID = '2026-08-24-12-pill-wrap';
+  const BUILD_ID = '2026-08-25-13-new-native-sheet-source';
 
   // ---------- Data sources: two tabs within the same workbook (no per-year sheets) ----------
   // "งานติดตาม" = active tracking sheet (gid 0). "งานที่แล้วเสร็จ" = completed-work
   // archive sheet (gid 552119194). Fiscal-year selection is a client-side filter over
   // these same two sheets, based on the "วันที่เริ่ม" column — see thaiFiscalYearOf().
   const VIEWS = {
-    tracking:  { key:'tracking',  label:'งานติดตาม',       icon:'📋', id:'1A9GP2bMue6FVqiWDIOXZVY0JUoV5hVPN', gid:0,         defaultStatus:null },
-    completed: { key:'completed', label:'งานที่แล้วเสร็จ', icon:'✅', id:'1A9GP2bMue6FVqiWDIOXZVY0JUoV5hVPN', gid:552119194, defaultStatus:'สำเร็จ' }
+    tracking:  { key:'tracking',  label:'งานติดตาม',       icon:'📋', id:'1x_iWZ-wTP71i4m6EpHQPyrUyaSiSCCefT4aDKMaY4_M', gid:1843765478, defaultStatus:null,       sheetUrl:'https://docs.google.com/spreadsheets/d/1x_iWZ-wTP71i4m6EpHQPyrUyaSiSCCefT4aDKMaY4_M/edit?gid=1843765478#gid=1843765478' },
+    completed: { key:'completed', label:'งานที่แล้วเสร็จ', icon:'✅', id:'1x_iWZ-wTP71i4m6EpHQPyrUyaSiSCCefT4aDKMaY4_M', gid:552119194,  defaultStatus:'สำเร็จ', sheetUrl:'https://docs.google.com/spreadsheets/d/1x_iWZ-wTP71i4m6EpHQPyrUyaSiSCCefT4aDKMaY4_M/edit?gid=552119194#gid=552119194' }
   };
   const DEPT_COLORS = ['var(--dept-a)','var(--dept-b)','var(--dept-c)','var(--dept-d)'];
 
@@ -794,9 +847,14 @@
     const wrap = document.getElementById('viewTabs');
     if(!wrap) return;
     wrap.innerHTML = Object.values(VIEWS).map(v => `
-      <button class="view-btn ${currentView===v.key?'active':''}" data-view="${v.key}">
-        <span class="view-icon">${v.icon}</span> ${escapeHtml(v.label)}
-      </button>
+      <div class="view-tab-group">
+        <button class="view-btn ${currentView===v.key?'active':''}" data-view="${v.key}">
+          <span class="view-icon">${v.icon}</span> ${escapeHtml(v.label)}
+        </button>
+        ${v.sheetUrl ? `<a class="view-sheet-link" href="${v.sheetUrl}" target="_blank" rel="noopener noreferrer" title="เปิดชีท &quot;${escapeHtml(v.label)}&quot; ใน Google Sheets">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>` : ''}
+      </div>
     `).join('');
     wrap.querySelectorAll('.view-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
