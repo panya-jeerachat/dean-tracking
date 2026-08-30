@@ -728,7 +728,7 @@
 
       // Overdue calculation: ระยะเวลา (วัน) [days elapsed] vs กำหนดเวลา (วัน) [days allotted].
       // Positive overdueDays means the item has run longer than its allotted timeframe.
-      const parseNum = (v) => { const n = parseFloat((v||'').replace(/,/g,'')); return isNaN(n) ? null : n; };
+      const parseNum = (v) => { const n = parseFloat((v||'').replace(/,/g,'')); return isNaN(n) ? null : Math.round(n); };
       const durationDays = durationDaysCol!==-1 ? parseNum(cells[durationDaysCol]) : null;
       const deadlineDays = deadlineDaysCol!==-1 ? parseNum(cells[deadlineDaysCol]) : null;
       const overdueDays = (durationDays!==null && deadlineDays!==null) ? (durationDays - deadlineDays) : null;
