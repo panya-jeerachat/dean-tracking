@@ -49,6 +49,18 @@
     text-transform:uppercase;
     color:var(--slate);
   }
+  .top-row{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;
+  }
+  .admin-login-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'Sarabun',sans-serif; font-size:12.5px; font-weight:600;
+    color:var(--dept-a); text-decoration:none;
+    padding:7px 13px; border:1px solid var(--dept-a); border-radius:999px;
+    white-space:nowrap; flex-shrink:0;
+    transition:background .15s, color .15s;
+  }
+  .admin-login-link:hover{background:var(--dept-a); color:#fff;}
 
   /* ---------- Header (normal flow — not sticky, so it scrolls away and frees room) ---------- */
   header.top{
@@ -384,7 +396,13 @@
 
 <header class="top">
   <div class="top-inner">
-    <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
+    <div class="top-row">
+      <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
+      <a class="admin-login-link" href="https://script.google.com/a/macros/msu.ac.th/s/AKfycbwi5SxQs9LLkRlcgaVvZGQa0tW9h7drOLN5dBVp754j6Peg9xqweTme51Xhpij9dGDm/exec" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        เข้าสู่ระบบผู้ดูแล
+      </a>
+    </div>
     <h1>แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
     <div class="subtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
 
