@@ -4,31 +4,80 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>แดชบอร์ดติดตามงาน — คณะวิศวกรรมศาสตร์ มมส</title>
+<script>
+  // ใช้ธีมที่ผู้ชมเลือกไว้ครั้งก่อนทันทีตั้งแต่ก่อนหน้าเว็บแสดง (กันหน้าจอกะพริบสีเดิม)
+  (function(){
+    try{
+      var t = localStorage.getItem('deanTrackingTheme');
+      if(t) document.documentElement.setAttribute('data-theme', t);
+    }catch(e){}
+  })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ================= THEMES =================
+     แต่ละธีมกำหนดเฉพาะโทนสีหลัก ส่วนสีสถานะ (สำเร็จ/กำลังดำเนินการ/เกินกำหนด) คงความหมายเดิมทุกธีม
+     --grad = ไล่เฉดสีของปุ่มที่กำลังเลือก ปุ่มซิงก์ แถบความคืบหน้า และแถบสีบนสุดของหน้า */
+  :root, :root[data-theme="sky"]{
+    --ink:#0F2A47; --ink-soft:#28496A; --slate:#5E7A93;
+    --paper:#F2F7FC; --card:#FFFFFF; --line:#DCE7F0; --line-soft:#EAF3FA;
+    --dept-a:#1D5C97; --dept-b:#2E86C1; --dept-c:#63A9DB; --dept-d:#0E4B72;
+    --grad:linear-gradient(120deg,#0E4B72 0%,#1D6FB5 45%,#38A8DA 100%);
+  }
+  :root[data-theme="maroon"]{
+    --ink:#3A1420; --ink-soft:#5E2A3A; --slate:#8A6470;
+    --paper:#FBF4F5; --card:#FFFFFF; --line:#F0DCE1; --line-soft:#F8EBEE;
+    --dept-a:#8E1B34; --dept-b:#B23A48; --dept-c:#D46A6A; --dept-d:#5E1022;
+    --grad:linear-gradient(120deg,#5E1022 0%,#A3243B 50%,#E0655A 100%);
+  }
+  :root[data-theme="emerald"]{
+    --ink:#0E2F2A; --ink-soft:#24514A; --slate:#5F827B;
+    --paper:#F0F8F6; --card:#FFFFFF; --line:#D5EAE3; --line-soft:#E5F3EE;
+    --dept-a:#0F766E; --dept-b:#14958A; --dept-c:#4DB6A5; --dept-d:#0B4F4A;
+    --grad:linear-gradient(120deg,#0B4F4A 0%,#0F8A7E 50%,#3CCB9F 100%);
+  }
+  :root[data-theme="indigo"]{
+    --ink:#1E1B4B; --ink-soft:#3B3780; --slate:#6D6A9C;
+    --paper:#F5F4FD; --card:#FFFFFF; --line:#E0DEF5; --line-soft:#EDECFA;
+    --dept-a:#4F46E5; --dept-b:#7C3AED; --dept-c:#A78BFA; --dept-d:#312E81;
+    --grad:linear-gradient(120deg,#312E81 0%,#5B3FE0 50%,#C026D3 100%);
+  }
+  :root[data-theme="gold"]{
+    --ink:#2A2A28; --ink-soft:#4B4A45; --slate:#7C7A72;
+    --paper:#F4F5F6; --card:#FFFFFF; --line:#E3E3DF; --line-soft:#EEEEEB;
+    --dept-a:#8A6A12; --dept-b:#6B6A64; --dept-c:#C29A2E; --dept-d:#45443F;
+    --grad:linear-gradient(120deg,#45443F 0%,#8A6A12 55%,#E2B53A 100%);
+  }
+  :root[data-theme="night"]{
+    --ink:#E6EEF7; --ink-soft:#B9C8D9; --slate:#8598AE;
+    --paper:#0D1522; --card:#152031; --line:#253347; --line-soft:#1B2839;
+    --dept-a:#5AA9E6; --dept-b:#7B8CF2; --dept-c:#4FD1C5; --dept-d:#A78BFA;
+    --grad:linear-gradient(120deg,#2563EB 0%,#7C3AED 55%,#06B6D4 100%);
+    --teal:#4FD1A5; --teal-bg:rgba(79,209,165,.14);
+    --amber:#F2B84B; --amber-bg:rgba(242,184,75,.14);
+    --burgundy:#F4798C; --burgundy-bg:rgba(244,121,140,.14);
+    --status-none-bg:#223047; --dot-empty:#2A3A51;
+    --tip-bg:#EEF3F9; --tip-fg:#0D1522;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 8px 24px -10px rgba(0,0,0,.55);
+    color-scheme:dark;
+  }
   :root{
-    --ink:#0F2A47;
-    --ink-soft:#28496A;
-    --slate:#5E7A93;
-    --paper:#F2F7FC;
-    --card:#FFFFFF;
-    --line:#DCE7F0;
-    --line-soft:#EAF3FA;
-    --teal:#1E8065;
-    --teal-bg:#E4F5EE;
-    --amber:#B4832A;
-    --amber-bg:#FBF1DE;
-    --burgundy:#A13E52;
-    --burgundy-bg:#F8E9ED;
-    --navy-tag:#1D5C97;
-    --dept-a:#1D5C97;
-    --dept-b:#2E86C1;
-    --dept-c:#63A9DB;
-    --dept-d:#0E4B72;
+    --teal:#1E8065; --teal-bg:#E4F5EE;
+    --amber:#B4832A; --amber-bg:#FBF1DE;
+    --burgundy:#A13E52; --burgundy-bg:#F8E9ED;
+    --navy-tag:var(--dept-a);
     --radius:14px;
-    --shadow:0 1px 2px rgba(15,42,71,0.05), 0 6px 20px -8px rgba(15,42,71,0.12);
+    /* ค่าที่คำนวณจากโทนสีหลัก จึงเปลี่ยนตามธีมอัตโนมัติ */
+    --status-none-bg:color-mix(in srgb, var(--slate) 14%, var(--card));
+    --dot-empty:color-mix(in srgb, var(--slate) 24%, var(--card));
+    --hover-line:color-mix(in srgb, var(--dept-a) 45%, var(--line));
+    --glass:color-mix(in srgb, var(--paper) 90%, transparent);
+    --glow:color-mix(in srgb, var(--dept-a) 45%, transparent);
+    --selection:color-mix(in srgb, var(--dept-b) 25%, transparent);
+    --tip-bg:var(--ink); --tip-fg:#fff;
+    --shadow:0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent), 0 6px 20px -8px color-mix(in srgb, var(--ink) 16%, transparent);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -38,8 +87,13 @@
     font-family:'Sarabun',sans-serif;
     -webkit-font-smoothing:antialiased;
     line-height:1.55;
+    transition:background-color .3s ease, color .3s ease;
   }
-  ::selection{background:#CFE3F5;}
+  /* แถบไล่เฉดสีบางๆ บนสุดของหน้า = สัญลักษณ์ของธีมที่เลือก */
+  body::before{
+    content:''; display:block; height:4px; background:var(--grad);
+  }
+  ::selection{background:var(--selection);}
   a{color:inherit;}
 
   .eyebrow{
@@ -52,19 +106,56 @@
   .top-row{
     display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;
   }
-  .admin-login-link{
+  .top-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap; position:relative;}
+  /* ปุ่มขอบไล่เฉดสี: พื้นเป็นสีการ์ด ขอบเป็น --grad — วางเมาส์แล้วเติมเต็มเป็นไล่เฉด */
+  .admin-login-link, .theme-btn{
     display:inline-flex; align-items:center; gap:6px;
     font-family:'Sarabun',sans-serif; font-size:12.5px; font-weight:600;
-    color:var(--dept-a); text-decoration:none;
-    padding:7px 13px; border:1px solid var(--dept-a); border-radius:999px;
+    color:var(--dept-a); text-decoration:none; cursor:pointer;
+    padding:7px 13px; border:1.5px solid transparent; border-radius:999px;
+    background:linear-gradient(var(--card),var(--card)) padding-box, var(--grad) border-box;
     white-space:nowrap; flex-shrink:0;
-    transition:background .15s, color .15s;
+    transition:color .2s, box-shadow .2s, transform .15s;
   }
-  .admin-login-link:hover{background:var(--dept-a); color:#fff;}
+  .admin-login-link:hover, .theme-btn:hover, .theme-btn[aria-expanded="true"]{
+    background:var(--grad) border-box; color:#fff; box-shadow:0 4px 14px -6px var(--glow);
+  }
+  .theme-btn .swatch-now{width:12px; height:12px; border-radius:50%; background:var(--grad); box-shadow:0 0 0 1.5px var(--card);}
+
+  /* ---------- Theme picker ---------- */
+  .theme-pop{
+    position:absolute; top:calc(100% + 8px); right:0; z-index:60;
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    box-shadow:var(--shadow), 0 18px 40px -18px color-mix(in srgb, var(--ink) 35%, transparent);
+    padding:12px; width:262px; display:none;
+  }
+  .theme-pop.open{display:block;}
+  .theme-pop-title{font-size:12px; color:var(--slate); margin:0 2px 8px;}
+  .theme-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  .theme-opt{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:10px 4px 8px; border-radius:10px; border:1.5px solid var(--line-soft);
+    background:var(--card); color:var(--ink-soft); cursor:pointer;
+    font-family:'Sarabun',sans-serif; font-size:12px; font-weight:600;
+    transition:border-color .15s, transform .15s;
+  }
+  .theme-opt:hover{border-color:var(--hover-line);}
+  .theme-opt[aria-checked="true"]{border-color:var(--dept-a); color:var(--ink);}
+  .theme-opt .sw{width:34px; height:34px; border-radius:50%; position:relative;}
+  .theme-opt[aria-checked="true"] .sw::after{
+    content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--dept-a);
+  }
+  .admin-login-link:focus-visible, .theme-btn:focus-visible, .theme-opt:focus-visible,
+  .sync-btn:focus-visible, .view-btn:focus-visible, .pill:focus-visible{
+    outline:2px solid var(--dept-b); outline-offset:2px;
+  }
 
   /* ---------- Header (normal flow — not sticky, so it scrolls away and frees room) ---------- */
   header.top{
     border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--dept-b) 12%, transparent) 0%, transparent 55%),
+      var(--paper);
   }
   .top-inner{
     max-width:1180px; margin:0 auto;
@@ -93,7 +184,7 @@
     display:flex; align-items:center; gap:6px;
     font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--slate);
   }
-  .conn-dot{width:7px; height:7px; border-radius:50%; background:#B7CBDD; flex-shrink:0;}
+  .conn-dot{width:7px; height:7px; border-radius:50%; background:var(--dot-empty); flex-shrink:0;}
   .conn-dot.ok{background:var(--teal);}
   .conn-dot.err{background:var(--burgundy);}
   .conn-dot.loading{background:var(--amber); animation:pulse 1s ease-in-out infinite;}
@@ -102,12 +193,14 @@
   .sync-btn{
     display:inline-flex; align-items:center; gap:7px;
     font-family:'Sarabun',sans-serif; font-size:13px; font-weight:600;
-    padding:7px 13px; border-radius:9px;
-    border:1px solid var(--ink); background:var(--ink); color:#fff;
-    cursor:pointer; white-space:nowrap;
-    transition:opacity .15s;
+    padding:8px 15px; border-radius:10px;
+    border:none; background:var(--grad); background-size:180% 100%; background-position:0% 50%;
+    color:#fff; cursor:pointer; white-space:nowrap;
+    box-shadow:0 4px 14px -6px var(--glow);
+    transition:background-position .45s ease, box-shadow .2s, transform .15s, opacity .15s;
   }
-  .sync-btn:hover{opacity:.88;}
+  .sync-btn:hover{background-position:100% 50%; box-shadow:0 8px 20px -8px var(--glow); transform:translateY(-1px);}
+  .sync-btn:active{transform:translateY(0);}
   .sync-btn:disabled{opacity:.55; cursor:default;}
   .sync-btn svg{transition:transform .6s linear;}
   .sync-btn.spinning svg{animation:spin 0.8s linear infinite;}
@@ -146,17 +239,18 @@
     color:var(--ink-soft); cursor:pointer; transition:background .15s, color .15s;
     display:flex; align-items:center; gap:6px;
   }
-  .view-btn:hover{color:var(--ink);}
-  .view-btn.active{background:var(--card); color:var(--ink); box-shadow:var(--shadow);}
+  .view-btn:hover{color:var(--ink); background:color-mix(in srgb, var(--card) 60%, transparent);}
+  .view-btn.active{background:var(--grad); color:#fff; box-shadow:0 4px 14px -6px var(--glow);}
   .view-icon{font-size:14px;}
 
   /* ---------- Department pills — the ONLY sticky element, stays pinned while scrolling ---------- */
   .pill-bar{
     position:sticky; top:0; z-index:40;
-    background:rgba(242,247,252,0.95);
+    background:var(--glass);
     backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line);
-    box-shadow:0 2px 10px -6px rgba(15,42,71,0.15);
+    box-shadow:0 2px 10px -6px color-mix(in srgb, var(--ink) 20%, transparent);
   }
   .pill-bar-inner{
     max-width:1180px; margin:0 auto; padding:12px 24px;
@@ -176,9 +270,10 @@
     flex-shrink:0;
     transition:background .15s, color .15s, border-color .15s;
   }
-  .pill:hover{border-color:#B7CBDD;}
+  .pill:hover{border-color:var(--hover-line); color:var(--ink);}
   .pill.active{
-    background:var(--ink); color:#fff; border-color:var(--ink);
+    background:var(--grad); color:#fff; border-color:transparent;
+    box-shadow:0 4px 14px -6px var(--glow);
   }
   .pill .count{opacity:.65; font-family:'JetBrains Mono',monospace; font-size:11px; margin-left:5px;}
 
@@ -200,7 +295,9 @@
   .kpi .label{margin-top:8px; font-size:12.5px; color:var(--slate);}
   .kpi.accent-teal .num{color:var(--teal);}
   .kpi.accent-amber .num{color:var(--amber);}
-  .kpi.accent-navy .num{color:var(--dept-a);}
+  .kpi.accent-navy .num{
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
 
   /* Status breakdown: stacked bar + legend, shows how many items sit at each of the 5 levels */
   .status-breakdown{
@@ -301,7 +398,7 @@
   .status-near{background:var(--teal-bg); color:var(--teal);}
   .status-progress{background:var(--amber-bg); color:var(--amber);}
   .status-track{background:var(--amber-bg); color:var(--amber);}
-  .status-none{background:#E7EEF5; color:var(--slate);}
+  .status-none{background:var(--status-none-bg); color:var(--slate);}
 
   .tag-stack{display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0;}
   .overdue-tag{
@@ -311,7 +408,7 @@
   }
   .task-card.overdue{
     border-color:var(--burgundy);
-    box-shadow:0 1px 2px rgba(161,62,82,0.08), 0 6px 20px -8px rgba(161,62,82,0.18);
+    box-shadow:0 1px 2px color-mix(in srgb, var(--burgundy) 10%, transparent), 0 6px 20px -8px color-mix(in srgb, var(--burgundy) 28%, transparent);
   }
   .card-dept-tag{
     display:flex; align-items:center; gap:6px;
@@ -340,13 +437,14 @@
 
   .timeline-dots{display:flex; gap:4px; align-items:center; flex-wrap:wrap;}
   .dot{
-    width:9px; height:9px; border-radius:50%; background:#D3E2EF; cursor:default; position:relative;
+    width:9px; height:9px; border-radius:50%; background:var(--dot-empty); cursor:default; position:relative;
   }
   .dot.filled{background:var(--dept-color, var(--ink));}
+  .dots-caption{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--slate); margin-left:6px; white-space:nowrap;}
   .dot[data-tip]:hover::after{
     content:attr(data-tip);
     position:absolute; bottom:130%; left:50%; transform:translateX(-50%);
-    background:var(--ink); color:#fff; font-size:11px; padding:6px 9px; border-radius:8px;
+    background:var(--tip-bg); color:var(--tip-fg); font-size:11px; padding:6px 9px; border-radius:8px;
     white-space:pre-line; width:200px; line-height:1.4; z-index:20; box-shadow:var(--shadow);
     font-family:'Sarabun',sans-serif;
   }
@@ -379,7 +477,10 @@
   .progress-bar{
     width:100%; height:6px; border-radius:999px; background:var(--line-soft); overflow:hidden;
   }
-  .progress-fill{height:100%; border-radius:999px; background:var(--dept-color, var(--ink)); transition:width .4s ease;}
+  .progress-fill{
+    height:100%; border-radius:999px; transition:width .4s ease;
+    background:linear-gradient(90deg, color-mix(in srgb, var(--dept-color, var(--ink)) 45%, var(--card)), var(--dept-color, var(--ink)));
+  }
   .dept-kpi-wrap{display:flex; align-items:center; gap:8px; margin-left:auto; flex-shrink:0;}
   .dept-kpi-num{
     font-family:'JetBrains Mono',monospace; font-weight:600; font-size:12.5px; color:var(--ink-soft);
@@ -389,6 +490,10 @@
 
   @media (max-width:640px){
     h1{font-size:21px;}
+    .theme-pop{right:auto; left:0;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{transition:none !important; animation:none !important;}
   }
 </style>
 </head>
@@ -398,10 +503,19 @@
   <div class="top-inner">
     <div class="top-row">
       <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
+      <div class="top-actions">
+      <button class="theme-btn" id="themeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="themePop">
+        <span class="swatch-now"></span> ธีมสี
+      </button>
+      <div class="theme-pop" id="themePop" role="radiogroup" aria-label="เลือกธีมสี">
+        <div class="theme-pop-title">เลือกธีมสีของแดชบอร์ด (จำไว้ในเบราว์เซอร์นี้)</div>
+        <div class="theme-grid" id="themeGrid"></div>
+      </div>
       <a class="admin-login-link" href="https://script.google.com/a/macros/msu.ac.th/s/AKfycbwi5SxQs9LLkRlcgaVvZGQa0tW9h7drOLN5dBVp754j6Peg9xqweTme51Xhpij9dGDm/exec" target="_blank" rel="noopener">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         เข้าสู่ระบบผู้ดูแล
       </a>
+      </div>
     </div>
     <h1>แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
     <div class="subtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
@@ -575,6 +689,21 @@
     return {day, month, year, sortKey: year*10000 + month*100 + day};
   }
 
+  // วันที่ทุกรูปแบบ -> ตัวเลข พ.ศ. yyyymmdd ใช้เทียบ/เรียงลำดับ (null ถ้าอ่านไม่ออก)
+  //   "17 พ.ย.68", "ผลประชุม 18 พฤษภาคม 2569"  (เดือนไทย)
+  //   "ประชุมกำกับติดตาม 7/09/2026", "7/9/2569" (ตัวเลข ปี ค.ศ. หรือ พ.ศ.)
+  function dateKeyOf(label){
+    const t = parseThaiDateLabel(label);
+    if(t) return t.sortKey;
+    const m = String(label||'').match(/(\d{1,2})\s*[\/\-.]\s*(\d{1,2})\s*[\/\-.]\s*(\d{2,4})/);
+    if(!m) return null;
+    const day = +m[1], month = +m[2]; let year = +m[3];
+    if(year < 100) year = year >= 50 ? 2500 + year : 2000 + year + 543;
+    else if(year < 2400) year += 543;
+    if(month<1 || month>12 || day<1 || day>31) return null;
+    return year*10000 + month*100 + day;
+  }
+
   // ---------- Build dashboard data from raw CSV rows, detecting columns by header text ----------
   function buildDataFromRows(rows, opts){
     opts = opts || {};
@@ -631,7 +760,7 @@
     // is recognized as "latest" correctly even if inserted somewhere other than the
     // very last column. Columns whose label has no parseable date keep their original
     // relative order and sort after all dated ones.
-    timelineCols.forEach(tc => { tc.parsed = parseThaiDateLabel(tc.label); });
+    timelineCols.forEach(tc => { const k = dateKeyOf(tc.label); tc.parsed = k === null ? null : {sortKey:k}; });
     timelineCols.forEach((tc, i) => { tc._origIndex = i; });
     timelineCols.sort((a, b) => {
       const da = a.parsed ? a.parsed.sortKey : null;
@@ -734,6 +863,44 @@
     const timelineLabels = timelineCols.map(tc=>tc.label);
     return {timeline_labels: timelineLabels, departments: departments.filter(d=>d.items.length)};
   }
+
+  // ---------- Theme picker ----------
+  const THEMES = [
+    { key:'sky',     name:'ฟ้าคราม',   grad:'linear-gradient(120deg,#0E4B72,#1D6FB5,#38A8DA)' },
+    { key:'maroon',  name:'เลือดหมู',   grad:'linear-gradient(120deg,#5E1022,#A3243B,#E0655A)' },
+    { key:'emerald', name:'มรกต',      grad:'linear-gradient(120deg,#0B4F4A,#0F8A7E,#3CCB9F)' },
+    { key:'indigo',  name:'อินดิโก',    grad:'linear-gradient(120deg,#312E81,#5B3FE0,#C026D3)' },
+    { key:'gold',    name:'เทา–ทอง',   grad:'linear-gradient(120deg,#45443F,#8A6A12,#E2B53A)' },
+    { key:'night',   name:'กลางคืน',   grad:'linear-gradient(120deg,#0D1522 35%,#2563EB 70%,#06B6D4)' }
+  ];
+  function currentTheme(){ return document.documentElement.getAttribute('data-theme') || 'sky'; }
+  function applyTheme(key){
+    document.documentElement.setAttribute('data-theme', key);
+    try{ localStorage.setItem('deanTrackingTheme', key); }catch(e){}
+    renderThemeGrid();
+  }
+  function renderThemeGrid(){
+    const grid = document.getElementById('themeGrid');
+    if(!grid) return;
+    const now = currentTheme();
+    grid.innerHTML = THEMES.map(t => `
+      <button type="button" class="theme-opt" role="radio" aria-checked="${t.key===now}" data-theme-key="${t.key}">
+        <span class="sw" style="background:${t.grad}"></span>${t.name}
+      </button>`).join('');
+    grid.querySelectorAll('.theme-opt').forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.themeKey)));
+  }
+  function setupThemePicker(){
+    const btn = document.getElementById('themeBtn');
+    const pop = document.getElementById('themePop');
+    if(!btn || !pop) return;
+    const setOpen = (open) => { pop.classList.toggle('open', open); btn.setAttribute('aria-expanded', String(open)); };
+    btn.addEventListener('click', (e) => { e.stopPropagation(); setOpen(!pop.classList.contains('open')); });
+    pop.addEventListener('click', (e) => e.stopPropagation());
+    document.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ setOpen(false); } });
+    renderThemeGrid();
+  }
+  setupThemePicker();
 
   // ---------- State ----------
   let DATASETS = {
@@ -935,13 +1102,35 @@
     });
   }
 
+  // รอบประชุมที่เกี่ยวกับเรื่องนี้: เริ่มนับตั้งแต่ "วันที่เริ่ม" ของเรื่อง (ไม่ใช่ตั้งแต่รอบแรกของระบบ)
+  // + รอบที่มีบันทึกแล้วเสมอ (แม้จะก่อนวันที่เริ่ม ข้อมูลจริงไม่ถูกซ่อน)
+  // ถ้าไม่ได้ระบุวันที่เริ่ม -> เริ่มนับจากรอบแรกที่มีบันทึก
+  const roundKeyCache = new Map();
+  function roundKey(label){
+    if(!roundKeyCache.has(label)) roundKeyCache.set(label, dateKeyOf(label));
+    return roundKeyCache.get(label);
+  }
+  function roundsForItem(item){
+    const recorded = new Set(item.timeline.map(t => t.label));
+    let threshold = dateKeyOf(item.startDate);
+    if(threshold === null){
+      const first = DATA.timeline_labels.find(l => recorded.has(l) && roundKey(l) !== null);
+      threshold = first ? roundKey(first) : null;
+    }
+    return DATA.timeline_labels.filter(l => recorded.has(l) || (threshold !== null && roundKey(l) !== null && roundKey(l) >= threshold));
+  }
+
   function renderTimelineDots(item, color){
-    return DATA.timeline_labels.map(lbl=>{
+    const labels = roundsForItem(item);
+    if(!labels.length) return `<span class="dots-caption" style="margin-left:0">ยังไม่มีรอบประชุมตั้งแต่วันที่เริ่ม</span>`;
+    const reported = labels.filter(l => item.timeline.some(t => t.label === l)).length;
+    const dots = labels.map(lbl=>{
       const entry = item.timeline.find(t=>t.label===lbl);
       const cls = entry ? 'dot filled' : 'dot';
-      const tip = entry ? `${lbl}\n${entry.text}` : lbl;
+      const tip = entry ? `${lbl}\n${entry.text}` : `${lbl}\n(ไม่มีรายงานในรอบนี้)`;
       return `<span class="${cls}" style="--dept-color:${color}" data-tip="${escapeHtml(tip)}"></span>`;
     }).join('');
+    return dots + `<span class="dots-caption" title="จำนวนรอบที่รายงาน / จำนวนรอบประชุมตั้งแต่เริ่มเรื่องนี้">รายงาน ${reported}/${labels.length} รอบ</span>`;
   }
 
   function renderCard(item, color, lastLabel, opts){
