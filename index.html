@@ -791,12 +791,16 @@
       // when the sheet has no ฝ่ายงาน column at all.
       if(deptCol !== -1){
         if(!title) continue; // spacer / old-style section-label row with no item data -> skip
-        const deptVal = cells[deptCol] || 'อื่นๆ';
-        if(deptIndexByName[deptVal] === undefined){
-          deptIndexByName[deptVal] = departments.length;
-          departments.push({name: deptVal, items: []});
+        // จัดกลุ่มด้วย "ชื่อที่ปรับรูปแบบแล้ว" ไม่ใช่ข้อความดิบ: ยุบช่องว่างซ้อน และไม่สนคำว่า "งาน"
+        // นำหน้า — ชื่อที่ต่างกันแค่นี้ถือเป็นฝ่ายเดียวกัน (ตรงกับหน้าระบบผู้ดูแล) ไม่แยกเป็นปุ่มซ้ำ
+        const deptVal = (cells[deptCol] || '').replace(/\s+/g,' ').trim() || 'อื่นๆ';
+        const deptGroupKey = deptVal.replace(/^งาน\s*/, '') || 'อื่นๆ';
+        if(deptIndexByName[deptGroupKey] === undefined){
+          deptIndexByName[deptGroupKey] = departments.length;
+          departments.push({name: deptVal, items: [], _variants: {}});
         }
-        current = departments[deptIndexByName[deptVal]];
+        current = departments[deptIndexByName[deptGroupKey]];
+        current._variants[deptVal] = (current._variants[deptVal] || 0) + 1;
       } else {
         // Legacy fallback: detect a merged section-header row (title empty, a cell
         // reading like "งาน...ฝ่าย...") to open a new department bucket.
@@ -859,6 +863,13 @@
         latest: timeline.length ? timeline[timeline.length-1] : null
       });
     }
+
+    // ชื่อหัวข้อของแต่ละฝ่าย = รูปแบบที่ใช้บ่อยที่สุดในชีท
+    departments.forEach(d => {
+      if(!d._variants) return;
+      d.name = Object.keys(d._variants).sort((a,b) => d._variants[b] - d._variants[a])[0];
+      delete d._variants;
+    });
 
     const timelineLabels = timelineCols.map(tc=>tc.label);
     return {timeline_labels: timelineLabels, departments: departments.filter(d=>d.items.length)};
