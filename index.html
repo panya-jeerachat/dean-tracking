@@ -108,7 +108,7 @@
   }
   .top-actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap; position:relative;}
   /* ปุ่มขอบไล่เฉดสี: พื้นเป็นสีการ์ด ขอบเป็น --grad — วางเมาส์แล้วเติมเต็มเป็นไล่เฉด */
-  .admin-login-link, .theme-btn{
+  .admin-login-link, .theme-btn, .home-link{
     display:inline-flex; align-items:center; gap:6px;
     font-family:'Sarabun',sans-serif; font-size:12.5px; font-weight:600;
     color:var(--dept-a); text-decoration:none; cursor:pointer;
@@ -117,7 +117,7 @@
     white-space:nowrap; flex-shrink:0;
     transition:color .2s, box-shadow .2s, transform .15s;
   }
-  .admin-login-link:hover, .theme-btn:hover, .theme-btn[aria-expanded="true"]{
+  .admin-login-link:hover, .theme-btn:hover, .home-link:hover, .theme-btn[aria-expanded="true"]{
     background:var(--grad) border-box; color:#fff; box-shadow:0 4px 14px -6px var(--glow);
   }
   .theme-btn .swatch-now{width:12px; height:12px; border-radius:50%; background:var(--grad); box-shadow:0 0 0 1.5px var(--card);}
@@ -145,7 +145,7 @@
   .theme-opt[aria-checked="true"] .sw::after{
     content:''; position:absolute; inset:-4px; border-radius:50%; border:2px solid var(--dept-a);
   }
-  .admin-login-link:focus-visible, .theme-btn:focus-visible, .theme-opt:focus-visible,
+  .admin-login-link:focus-visible, .theme-btn:focus-visible, .home-link:focus-visible, .theme-opt:focus-visible,
   .sync-btn:focus-visible, .view-btn:focus-visible, .pill:focus-visible{
     outline:2px solid var(--dept-b); outline-offset:2px;
   }
@@ -173,6 +173,7 @@
     color:var(--ink-soft);
     font-size:14.5px;
     max-width:640px;
+    white-space:pre-line; /* ผู้ดูแลขึ้นบรรทัดใหม่ในข้อความได้ */
   }
 
   /* Sync button + connection status combined onto one row to save space */
@@ -504,6 +505,10 @@
     <div class="top-row">
       <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
       <div class="top-actions">
+      <a class="home-link" href="https://eng.msu.ac.th" title="ไปที่เว็บไซต์คณะวิศวกรรมศาสตร์ eng.msu.ac.th">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
+        หน้าหลัก
+      </a>
       <button class="theme-btn" id="themeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="themePop">
         <span class="swatch-now"></span> ธีมสี
       </button>
@@ -517,8 +522,8 @@
       </a>
       </div>
     </div>
-    <h1>แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
-    <div class="subtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
+    <h1 id="siteTitle">แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
+    <div class="subtitle" id="siteSubtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
 
     <div class="sync-row">
       <button class="sync-btn" id="syncBtn" type="button">
@@ -1350,6 +1355,47 @@
     line.querySelector('span:last-child').textContent = text;
   }
 
+  // ---------- Header text (แก้ได้จากหน้าระบบผู้ดูแล → "ตั้งค่าหน้าแดชบอร์ด") ----------
+  // อ่านจากชีท "DashboardSettings" ในไฟล์เดียวกัน (คอลัมน์ key | value) ถ้าอ่านไม่ได้จะใช้ข้อความ
+  // ที่เขียนไว้ใน HTML นี้ตามเดิม และจำค่าล่าสุดไว้ในเบราว์เซอร์ เปิดครั้งหน้าจะไม่กะพริบข้อความเก่า
+  const SETTINGS_SHEET = 'DashboardSettings';
+  const SITE_TEXT_CACHE = 'deanTrackingSiteText';
+  function applySiteText(t){
+    if(!t) return;
+    if(t.title){
+      document.getElementById('siteTitle').textContent = t.title;
+      document.title = t.title + ' — คณะวิศวกรรมศาสตร์ มมส';
+    }
+    if(typeof t.subtitle === 'string'){
+      const el = document.getElementById('siteSubtitle');
+      el.textContent = t.subtitle;
+      el.style.display = t.subtitle ? '' : 'none';
+    }
+  }
+  function loadCachedSiteText(){
+    try{ const c = localStorage.getItem(SITE_TEXT_CACHE); if(c) applySiteText(JSON.parse(c)); }catch(e){}
+  }
+  async function syncSiteText(){
+    try{
+      const url = `https://docs.google.com/spreadsheets/d/${VIEWS.tracking.id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(SETTINGS_SHEET)}`;
+      const res = await fetch(url, {cache:'no-store'});
+      if(!res.ok) return;
+      const rows = parseCSV(await res.text());
+      // ถ้ายังไม่มีชีทนี้ Google อาจส่งชีทแรกกลับมาแทน -> ตรวจหัวตารางก่อนใช้ ไม่ใช่ก็ข้ามไป
+      if(!rows.length || normCell(rows[0][0]).toLowerCase() !== 'key' || normCell(rows[0][1]).toLowerCase() !== 'value') return;
+      const t = {};
+      rows.slice(1).forEach(r => {
+        const k = normCell(r[0]);
+        if(k === 'title' || k === 'subtitle') t[k] = (r[1] || '').replace(/\r/g,'').trim();
+      });
+      if(!t.title) return;
+      applySiteText(t);
+      try{ localStorage.setItem(SITE_TEXT_CACHE, JSON.stringify(t)); }catch(e){}
+    } catch(err){
+      console.warn('[dashboard] could not load header text settings:', err);
+    }
+  }
+
   // ---------- Live sync (fetches every configured view together) ----------
   async function syncLive(manual){
     const btn = document.getElementById('syncBtn');
@@ -1358,6 +1404,7 @@
     setConn('loading', 'กำลังซิงก์ข้อมูล...');
 
     const activeViews = Object.values(VIEWS).filter(v => v.gid !== null);
+    syncSiteText(); // โหลดข้อความหัวหน้าเว็บคู่กันไป (ไม่รอ ไม่กระทบการโหลดข้อมูลงาน)
     let anySuccess = false;
     let lastErr = null;
 
@@ -1400,6 +1447,7 @@
   document.getElementById('syncBtn').addEventListener('click', ()=>syncLive(true));
 
   // ---------- Init ----------
+  loadCachedSiteText();
   renderViewSwitch();
   renderAll();
   syncLive(false); // silent auto-sync on load; falls back to embedded snapshot on failure
