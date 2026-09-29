@@ -450,6 +450,35 @@
     font-family:'Sarabun',sans-serif;
   }
 
+  /* ---------- ไฟล์แนบหลักฐาน ---------- */
+  .att-row{display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
+  .att-label{font-size:11.5px; color:var(--slate); font-weight:600; margin-right:2px;}
+  .att-chip{
+    display:inline-flex; align-items:center; gap:6px; max-width:100%;
+    padding:3px 9px 3px 3px; border-radius:999px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink-soft); text-decoration:none; font-size:11.5px;
+    transition:border-color .15s, box-shadow .15s, transform .15s;
+  }
+  .att-chip:hover{border-color:var(--hover-line); color:var(--ink); box-shadow:0 4px 12px -8px var(--glow); transform:translateY(-1px);}
+  .att-chip .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:150px;}
+  .att-chip .ft{
+    flex-shrink:0; border-radius:999px; color:#fff; font-family:'JetBrains Mono',monospace;
+    font-size:9px; font-weight:700; padding:2px 6px; letter-spacing:.3px;
+  }
+  .ft.pdf{background:linear-gradient(135deg,#B42318,#E5484D);}
+  .ft.img{background:linear-gradient(135deg,#0E7C66,#2DBE9B);}
+  .ft.doc{background:linear-gradient(135deg,#1D4ED8,#3B82F6);}
+  .ft.xls{background:linear-gradient(135deg,#166534,#22A55B);}
+  .ft.ppt{background:linear-gradient(135deg,#B45309,#F08A24);}
+  .ft.other{background:linear-gradient(135deg,#475569,#94A3B8);}
+  .att-rest{display:none;}
+  .att-row.show-all .att-rest{display:contents;}
+  .att-row.show-all .att-more{display:none;}
+  .att-more{
+    border:none; background:none; cursor:pointer; padding:3px 4px;
+    font-family:'Sarabun',sans-serif; font-size:11.5px; font-weight:600; color:var(--dept-color, var(--dept-a));
+  }
+
   .expand-btn{
     align-self:flex-start;
     background:none; border:none; cursor:pointer;
@@ -663,6 +692,42 @@
     return rows;
   }
 
+  // ไฟล์แนบ: 1 ไฟล์ต่อ 1 บรรทัดในเซลล์ รูปแบบ "ชื่อไฟล์ | ลิงก์" (ตรงกับที่ระบบผู้ดูแลบันทึก)
+  function parseAttachments(cell){
+    return String(cell||'').split(/\r?\n/).map(line => {
+      line = line.trim();
+      if(!line) return null;
+      const bar = line.lastIndexOf(' | ');
+      if(bar !== -1) return {name: line.slice(0, bar).trim(), url: line.slice(bar + 3).trim()};
+      if(/^https?:\/\//i.test(line)){ let n = line.split('/').pop(); try{ n = decodeURIComponent(n); }catch(e){} return {name: n || 'ไฟล์แนบ', url: line}; }
+      return null;
+    }).filter(a => a && /^https:\/\//i.test(a.url)); // รับเฉพาะลิงก์ https
+  }
+  function fileKind(name){
+    const ext = String(name).split('.').pop().toLowerCase();
+    if(ext === 'pdf') return ['pdf','PDF'];
+    if(['jpg','jpeg','png','webp','heic'].includes(ext)) return ['img','IMG'];
+    if(ext === 'doc' || ext === 'docx') return ['doc','DOC'];
+    if(ext === 'xls' || ext === 'xlsx') return ['xls','XLS'];
+    if(ext === 'ppt' || ext === 'pptx') return ['ppt','PPT'];
+    return ['other','FILE'];
+  }
+  function renderAttachChips(list){
+    if(!list || !list.length) return '';
+    const MAX = 3;
+    const chips = list.slice(0, MAX).map(a => {
+      const [k, lbl] = fileKind(a.name);
+      return `<a class="att-chip" href="${escapeHtml(a.url)}" target="_blank" rel="noopener" title="${escapeHtml(a.name)}"><span class="ft ${k}">${lbl}</span><span class="nm">${escapeHtml(a.name)}</span></a>`;
+    });
+    const more = list.length > MAX
+      ? `<button type="button" class="att-more" data-more="${list.length - MAX}">+${list.length - MAX} ไฟล์</button>` : '';
+    const hidden = list.length > MAX ? `<span class="att-rest">` + list.slice(MAX).map(a => {
+      const [k, lbl] = fileKind(a.name);
+      return `<a class="att-chip" href="${escapeHtml(a.url)}" target="_blank" rel="noopener" title="${escapeHtml(a.name)}"><span class="ft ${k}">${lbl}</span><span class="nm">${escapeHtml(a.name)}</span></a>`;
+    }).join('') + `</span>` : '';
+    return `<div class="att-row"><span class="att-label">📎 หลักฐาน ${list.length} ไฟล์</span>${chips.join('')}${hidden}${more}</div>`;
+  }
+
   function normCell(s){
     return (s||'').replace(/\u00A0/g,' ').replace(/\uFEFF/g,'').trim();
   }
@@ -731,7 +796,7 @@
     }
 
     const header = rows[headerRowIdx].map(c => normCell(c).replace(/^"+|"+$/g,'').replace(/\s+/g,' '));
-    let noCol=-1, titleCol=-1, actionCol=-1, deadlineCol=-1, respCol=-1, deptCol=-1, noteCol=-1, statusCol=-1, kpiCol=-1;
+    let noCol=-1, titleCol=-1, actionCol=-1, deadlineCol=-1, respCol=-1, deptCol=-1, noteCol=-1, statusCol=-1, kpiCol=-1, attachCol=-1;
     let startDateCol=-1, doneDateCol=-1, durationDaysCol=-1, deadlineDaysCol=-1;
     const timelineCols = [];
 
@@ -756,6 +821,8 @@
       if(h === 'หมายเหตุ' && noteCol === -1){ noteCol = idx; return; }
       if(h === 'สถานะ' && statusCol === -1){ statusCol = idx; return; }
       if(h.includes('ความคืบหน้า') && h.includes('KPI') && kpiCol === -1){ kpiCol = idx; return; }
+      // คอลัมน์ไฟล์แนบหลักฐาน (ระบบผู้ดูแลสร้างให้) — ต้องดักไว้ก่อน ไม่อย่างนั้นจะกลายเป็นรอบประชุม
+      if((h.startsWith('ไฟล์แนบ') || h === 'หลักฐาน' || h === 'เอกสารแนบ') && attachCol === -1){ attachCol = idx; return; }
       // everything else with header text -> treated as a timeline/meeting column
       timelineCols.push({index: idx, label: h});
     });
@@ -865,7 +932,8 @@
         status: statusRaw,
         kpi: kpiCol!==-1 ? cells[kpiCol] : '',
         timeline: timeline,
-        latest: timeline.length ? timeline[timeline.length-1] : null
+        latest: timeline.length ? timeline[timeline.length-1] : null,
+        attachments: attachCol!==-1 ? parseAttachments(cells[attachCol]) : []
       });
     }
 
@@ -1197,6 +1265,7 @@
       ${metaBits.length ? `<div class="meta-line">${metaBits.join('')}</div>` : ''}
       ${latestHtml}
       <div class="timeline-dots">${renderTimelineDots(item, color)}</div>
+      ${renderAttachChips(item.attachments)}
       ${extraFields.length || fullTimeline ? `
       <button class="expand-btn" type="button">
         ดูรายละเอียด / ประวัติทั้งหมด (${item.timeline.length} รอบ)
@@ -1299,6 +1368,9 @@
     }
 
     main.innerHTML = html;
+    main.querySelectorAll('.att-more').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ btn.closest('.att-row').classList.add('show-all'); });
+    });
     main.querySelectorAll('.expand-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         btn.closest('.task-card').classList.toggle('expanded');
