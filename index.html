@@ -360,6 +360,26 @@
     padding-bottom:10px; border-bottom:1px solid var(--line);
   }
   .dept-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0; margin-bottom:2px;}
+  /* ---------- บุคลากร (รูปเล็ก + ป๊อปอัป) ---------- */
+  .pav{--sz:28px; width:var(--sz); height:var(--sz); border-radius:50%; overflow:hidden; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+    background:linear-gradient(135deg,#A78BFA,#7C3AED); color:#fff; font-family:'Kanit',sans-serif; font-size:calc(var(--sz) * .42); font-weight:600;
+    box-shadow:0 0 0 2px var(--card); cursor:pointer; position:relative; vertical-align:middle; transition:transform .15s;}
+  .pav:hover{transform:translateY(-2px) scale(1.06); z-index:2;}
+  .pav img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 18%;}
+  .pav.sm{--sz:22px;} .pav-stack{display:inline-flex; align-items:center;} .pav-stack .pav + .pav{margin-left:-8px;}
+  .dept-leaders{display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:var(--slate); cursor:pointer;}
+  .dept-leaders b{color:var(--ink-soft); font-weight:600;}
+  .pp-back{position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:200; display:none; align-items:center; justify-content:center; padding:16px;}
+  .pp-back.open{display:flex;}
+  .pp{background:var(--card); border-radius:22px; width:min(380px,100%); padding:22px; text-align:center; box-shadow:0 30px 70px -30px rgba(0,0,0,.5); animation:noticeIn .25s ease-out;}
+  .pp .ph{width:150px; height:150px; border-radius:22px; overflow:hidden; margin:0 auto 12px; background:linear-gradient(135deg,#A78BFA,#7C3AED); color:#fff; display:flex; align-items:center; justify-content:center; font-size:56px; font-family:'Kanit',sans-serif;}
+  .pp .ph img{width:100%; height:100%; object-fit:cover; object-position:center 18%;}
+  .pp h3{margin:0; font-family:'Kanit',sans-serif; font-size:19px; color:var(--ink);} .pp .pos{color:var(--ink-soft); font-size:13.5px; margin-top:3px;}
+  .pp .grid{display:grid; grid-template-columns:auto 1fr; gap:6px 12px; text-align:left; margin-top:14px; font-size:13.5px; background:var(--line-soft); border-radius:14px; padding:12px 14px; color:var(--ink);}
+  .pp .grid span{color:var(--slate);} .pp a{color:var(--dept-a);}
+  .pp button{margin-top:14px; border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:12px; padding:9px 22px; font-family:inherit; font-weight:600; cursor:pointer;}
+  .live-flash{animation:liveFlash 1.6s ease-out;}
+  @keyframes liveFlash{0%{box-shadow:0 0 0 3px var(--dept-b);}100%{box-shadow:var(--shadow);}}
   .dept-head h2{
     font-family:'Kanit',sans-serif; font-weight:600; font-size:17px; margin:0;
     color:var(--ink);
@@ -1252,7 +1272,8 @@
     const isOverdue = item.overdueDays !== null && item.overdueDays > 0 && status.key !== 'done';
 
     const metaBits = [];
-    if(item.responsible) metaBits.push(`<span><b>ผู้รับผิดชอบ</b> ${escapeHtml(item.responsible)}</span>`);
+    if(item.responsible){ const rps = peopleOf(item.responsible);
+      metaBits.push(`<span>${rps.length ? '<span class="pav-stack">' + rps.slice(0, 4).map(p => pavHtml(p, 'sm')).join('') + '</span> ' : ''}<b>ผู้รับผิดชอบ</b> ${escapeHtml(item.responsible)}</span>`); }
     if(item.deadlineDays !== null) metaBits.push(`<span><b>กำหนดเวลา</b> ${item.deadlineDays} วัน</span>`);
     if(item.durationDays !== null) metaBits.push(`<span><b>ผ่านมาแล้ว</b> ${item.durationDays} วัน</span>`);
     if(!item.deadlineDays && item.deadline) metaBits.push(`<span><b>กำหนดเวลา</b> ${escapeHtml(item.deadline)}</span>`);
@@ -1373,6 +1394,7 @@
         <div class="dept-head">
           <span class="dept-dot" style="background:${color}"></span>
           <h2>${escapeHtml(d.name.trim())}</h2>
+          ${leadersHtml(d.name)}
           <span class="dept-count">${activeItems.length} เรื่อง</span>
           <div class="dept-kpi-wrap">
             <div class="progress-bar dept-kpi-bar"><div class="progress-fill" style="width:${kpi}%; --dept-color:${color}"></div></div>
@@ -1517,6 +1539,117 @@
   }
 
   // ---------- Live sync (fetches every configured view together) ----------
+  // ---------- บุคลากร (จากชีท Personnel ที่ระบบผู้ดูแลซิงก์มาจากฐานข้อมูลกลาง) ----------
+  const PERSONNEL_SHEET = 'Personnel';
+  // สถานะที่ถือว่าพ้นสภาพแล้ว (ชุดเดียวกับ CONFIG.PERSONNEL.INACTIVE_STATUS ใน Code.gs)
+  const INACTIVE_RE = /พ้นสภาพ|ลาออก|เกษียณ|โอนย้าย|ย้ายไป|ย้ายออก|เสียชีวิต|ถึงแก่กรรม|สิ้นสุดสัญญา|หมดสัญญา|เลิกจ้าง|ไม่ได้ปฏิบัติงาน|ไม่ปฏิบัติงาน|ยกเลิก|inactive|resign|retire/i;
+  let PEOPLE = [];
+  try{ PEOPLE = JSON.parse(localStorage.getItem('deanTrackingPeople') || '[]').filter(p => !INACTIVE_RE.test(p.status || '')); }catch(e){}
+  async function loadPeople(){
+    try{
+      const url = `https://docs.google.com/spreadsheets/d/${VIEWS.tracking.id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(PERSONNEL_SHEET)}`;
+      const res = await fetch(url, {cache:'no-store'});
+      if(!res.ok) return false;
+      const rows = parseCSV(await res.text());
+      const h = (rows[0] || []).map(x => normCell(x));
+      if(h.indexOf('fullName') === -1) return false;     // ยังไม่มีชีท Personnel
+      const ix = k => h.indexOf(k);
+      PEOPLE = rows.slice(1).map(r => {
+        const o = {}; ['code','fullName','name','title','position','unit','building','floor','room','email','photo','status','depts'].forEach(k => o[k] = ix(k) === -1 ? '' : normCell(r[ix(k)])); return o;
+      }).filter(p => (p.fullName || p.name) && !INACTIVE_RE.test(p.status || ''));   // ไม่แสดงบุคลากรที่พ้นสภาพ
+      try{ localStorage.setItem('deanTrackingPeople', JSON.stringify(PEOPLE)); }catch(e){}
+      return true;
+    }catch(e){ return false; }
+  }
+  function personOf(text){
+    const t = String(text || '').replace(/\s+/g, ' ').trim();
+    if(!t) return null;
+    return PEOPLE.find(p => p.email && p.email.toLowerCase() === t.toLowerCase()) || PEOPLE.find(p => p.fullName === t || p.name === t)
+        || PEOPLE.find(p => p.name && p.name.length > 4 && t.indexOf(p.name) !== -1) || null;
+  }
+  // ผู้บริหารประจำฝ่าย: จากตำแหน่ง "รองคณบดี/ผู้ช่วยคณบดี ... ฝ่ายXXX" (หลักเดียวกับหน้าผู้ดูแล)
+  // ชื่อฝ่ายเดียวกัน = ต่างกันแค่ช่องว่าง/คำว่า "งาน" (หลักเดียวกับหน้าผู้ดูแล)
+  function deptKeyP(x){ return String(x || '').replace(/\s+/g, ' ').trim().replace(/^งาน\s*/, '') || 'อื่นๆ'; }
+  function scopeMatchP(entry, deptName){
+    const e = String(entry || '').trim();
+    const legacy = !/\s/.test(e) && e.length <= 12 && e !== 'อื่นๆ' && !/^งาน/.test(e);
+    return legacy ? String(deptName || '').indexOf(e) !== -1 : deptKeyP(e) === deptKeyP(deptName);
+  }
+  // ผู้รับผิดชอบประจำฝ่าย = ผู้บริหารตามตำแหน่ง + บัญชีผู้ใช้ที่ได้รับขอบเขตฝ่ายนั้น (คอลัมน์ depts ในชีท Personnel)
+  function deptLeaders(deptName){
+    const d = String(deptName || '').replace(/\s+/g, ''), after = d.replace(/^.*?ฝ่าย/, '');
+    const hits = [];
+    PEOPLE.forEach(p => {
+      const m = String(p.position || '').match(/(รองคณบดี|ผู้ช่วยคณบดี)[^ฝ]*ฝ่าย\s*(.+)$/);
+      if(!m) return;
+      const phrase = m[2].replace(/\s+/g, ''), first = m[2].trim().split(/\s|และ/)[0];
+      let sc = 0;
+      if(phrase && d.indexOf(phrase) !== -1) sc = 3; else if(first.length >= 4 && after.indexOf(first) === 0) sc = 2;
+      if(sc) hits.push({ p, sc: sc + (m[1] === 'รองคณบดี' ? 1 : 0) });
+    });
+    const out = hits.sort((a, b) => b.sc - a.sc).map(h => h.p);
+    PEOPLE.forEach(p => {
+      if(out.indexOf(p) !== -1 || !p.depts) return;
+      if(String(p.depts).split(/\n/).some(e => scopeMatchP(e, deptName))) out.push(p);
+    });
+    return out;
+  }
+  // ผู้รับผิดชอบหลายคน: คั่นด้วย , ; / ขึ้นบรรทัดใหม่ หรือ " และ "
+  function peopleOf(text){
+    const out = [];
+    String(text || '').split(/\s*(?:,|，|;|\n|\/|\s+และ\s+)\s*/).filter(Boolean).forEach(t => { const p = personOf(t); if(p && out.indexOf(p) === -1) out.push(p); });
+    if(!out.length){ const p = personOf(text); if(p) out.push(p); }
+    return out;
+  }
+  function initial(p){ return String(p.name || p.fullName || '?').replace(/^(นางสาว|นาง|นาย)/, '').trim().charAt(0); }
+  function pavHtml(p, cls){
+    const key = escapeHtml(p.email || p.fullName || p.name);
+    return `<span class="pav ${cls || ''}" data-person="${key}" title="${escapeHtml(p.fullName || p.name)}">${escapeHtml(initial(p))}${p.photo ? `<img src="${escapeHtml(p.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>`;
+  }
+  function leadersHtml(deptName){
+    const L = deptLeaders(deptName).slice(0, 3);
+    if(!L.length) return '';
+    return `<span class="dept-leaders" data-person="${escapeHtml(L[0].email || L[0].fullName)}"><span class="pav-stack">${L.map(p => pavHtml(p)).join('')}</span><span><b>${escapeHtml(L[0].fullName)}</b>${L.length > 1 ? ' และอีก ' + (L.length - 1) + ' ท่าน' : ''}</span></span>`;
+  }
+  function openPerson(key){
+    const p = PEOPLE.find(x => (x.email && x.email === key) || x.fullName === key || x.name === key);
+    if(!p) return;
+    const loc = [p.building && 'อาคาร ' + p.building, p.floor && 'ชั้น ' + p.floor, p.room && 'ห้อง ' + p.room].filter(Boolean).join(' ');
+    document.getElementById('ppBody').innerHTML = `<div class="ph">${p.photo ? `<img src="${escapeHtml(p.photo)}" alt="" referrerpolicy="no-referrer">` : escapeHtml(initial(p))}</div>
+      <h3>${escapeHtml(p.fullName || p.name)}</h3><div class="pos">${escapeHtml(p.position || '')}</div>
+      <div class="grid">${p.unit ? `<span>หน่วยงาน</span><b>${escapeHtml(p.unit)}</b>` : ''}${loc ? `<span>สถานที่</span><b>${escapeHtml(loc)}</b>` : ''}${p.email ? `<span>อีเมล</span><b><a href="mailto:${escapeHtml(p.email)}">${escapeHtml(p.email)}</a></b>` : ''}</div>
+      <button type="button" onclick="document.getElementById('ppBack').classList.remove('open')">ปิด</button>`;
+    document.getElementById('ppBack').classList.add('open');
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-person]');
+    if(el){ e.preventDefault(); e.stopPropagation(); openPerson(el.getAttribute('data-person')); }
+  }, true);
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') document.getElementById('ppBack').classList.remove('open'); });
+
+  // ---------- อัปเดตทันที: ตรวจ "เวอร์ชันข้อมูล" ขนาดเล็กทุก 15 วินาที ----------
+  // ระบบผู้ดูแลเขียนเวอร์ชันใหม่ทุกครั้งที่บันทึก/ย้ายเรื่อง/อัปเดตข้อมูลบุคลากร -> หน้าที่เปิดค้างไว้ดึงข้อมูลใหม่ทันที
+  let metaVersions = { dataVersion: null, personnelVersion: null };
+  async function checkMeta(){
+    try{
+      const url = `https://docs.google.com/spreadsheets/d/${VIEWS.tracking.id}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(SETTINGS_SHEET)}&_=${Date.now()}`;
+      const res = await fetch(url, {cache:'no-store'});
+      if(!res.ok) return;
+      const rows = parseCSV(await res.text());
+      if(!rows.length || normCell(rows[0][0]).toLowerCase() !== 'key') return;
+      const m = {}; rows.slice(1).forEach(r => { m[normCell(r[0])] = normCell(r[1]); });
+      const dv = m.dataVersion || null, pv = m.personnelVersion || null;
+      const first = metaVersions.dataVersion === null && metaVersions.personnelVersion === null;
+      if(!first && pv && pv !== metaVersions.personnelVersion){ await loadPeople(); renderAll(); }
+      if(!first && dv && dv !== metaVersions.dataVersion){ await syncLive(false); flashUpdated(); }
+      metaVersions = { dataVersion: dv, personnelVersion: pv };
+    }catch(e){}
+  }
+  function flashUpdated(){
+    const el = document.getElementById('connLine');
+    if(el){ el.classList.remove('live-flash'); void el.offsetWidth; el.classList.add('live-flash'); }
+  }
+
   // ---------- ความสดของข้อมูล ----------
   const PUB_CACHE = 'deanTrackingPublicCache';
   const viewState = {};   // key -> { fresh: bool, at: Date|null, error: string }
@@ -1602,12 +1735,16 @@
   renderViewSwitch();
   renderAll();
   syncLive(false);
+  loadPeople().then(ok => { if(ok) renderAll(); });
+  checkMeta();
+  setInterval(() => { if(!document.hidden) checkMeta(); }, 15000);   // ตรวจการเปลี่ยนแปลงแบบเบาทุก 15 วินาที
   // อัปเดตอัตโนมัติ: ทุก 2 นาทีเมื่อเปิดหน้าอยู่ และทันทีที่กลับมาที่แท็บนี้
   let lastAutoSync = Date.now();
   setInterval(() => { if(!document.hidden){ lastAutoSync = Date.now(); syncLive(false); } }, 120000);
-  document.addEventListener('visibilitychange', () => { if(!document.hidden && Date.now() - lastAutoSync > 30000){ lastAutoSync = Date.now(); syncLive(false); } });
+  document.addEventListener('visibilitychange', () => { if(!document.hidden){ checkMeta(); if(Date.now() - lastAutoSync > 30000){ lastAutoSync = Date.now(); syncLive(false); } } });
 })();
 
 </script>
+<div class="pp-back" id="ppBack" onclick="if(event.target===this) this.classList.remove('open')"><div class="pp" id="ppBody"></div></div>
 </body>
 </html>
