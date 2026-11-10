@@ -20,7 +20,15 @@
   /* ================= THEMES =================
      แต่ละธีมกำหนดเฉพาะโทนสีหลัก ส่วนสีสถานะ (สำเร็จ/กำลังดำเนินการ/เกินกำหนด) คงความหมายเดิมทุกธีม
      --grad = ไล่เฉดสีของปุ่มที่กำลังเลือก ปุ่มซิงก์ แถบความคืบหน้า และแถบสีบนสุดของหน้า */
-  :root, :root[data-theme="sky"]{
+  /* ธีมเริ่มต้น "สเปกตรัม" — Full Color สดใส ทันสมัย (น้ำเงิน → ฟ้าเขียว → เขียว → ส้ม) ไม่เน้นม่วง
+     แต่ละฝ่ายงานได้สีประจำของตัวเอง (dept-a ... dept-f) */
+  :root, :root[data-theme="spectrum"]{
+    --ink:#10223D; --ink-soft:#2C4363; --slate:#62758F;
+    --paper:#F3F7FB; --card:#FFFFFF; --line:#DFE7F1; --line-soft:#EDF2F8;
+    --dept-a:#2563EB; --dept-b:#0E9F9A; --dept-c:#F97316; --dept-d:#E11D74; --dept-e:#16A34A; --dept-f:#D97706;
+    --grad:linear-gradient(110deg,#1D4ED8 0%,#0891B2 38%,#10B981 68%,#F59E0B 100%);
+  }
+  :root[data-theme="sky"]{
     --ink:#0F2A47; --ink-soft:#28496A; --slate:#5E7A93;
     --paper:#F2F7FC; --card:#FFFFFF; --line:#DCE7F0; --line-soft:#EAF3FA;
     --dept-a:#1D5C97; --dept-b:#2E86C1; --dept-c:#63A9DB; --dept-d:#0E4B72;
@@ -54,7 +62,8 @@
     --ink:#E6EEF7; --ink-soft:#B9C8D9; --slate:#8598AE;
     --paper:#0D1522; --card:#152031; --line:#253347; --line-soft:#1B2839;
     --dept-a:#5AA9E6; --dept-b:#7B8CF2; --dept-c:#4FD1C5; --dept-d:#A78BFA;
-    --grad:linear-gradient(120deg,#2563EB 0%,#7C3AED 55%,#06B6D4 100%);
+    --grad:linear-gradient(120deg,#2563EB 0%,#0EA5E9 50%,#14B8A6 100%);
+    --dept-e:#4ADE80; --dept-f:#FBBF24;
     --teal:#4FD1A5; --teal-bg:rgba(79,209,165,.14);
     --amber:#F2B84B; --amber-bg:rgba(242,184,75,.14);
     --burgundy:#F4798C; --burgundy-bg:rgba(244,121,140,.14);
@@ -366,7 +375,8 @@
     box-shadow:0 0 0 2px var(--card); cursor:pointer; position:relative; vertical-align:middle; transition:transform .15s;}
   .pav:hover{transform:translateY(-2px) scale(1.06); z-index:2;}
   .pav img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 18%;}
-  .pav.sm{--sz:22px;} .pav-stack{display:inline-flex; align-items:center;} .pav-stack .pav + .pav{margin-left:-8px;}
+  .pav.sm{--sz:22px;} .pav.more{background:var(--line-soft); color:var(--ink-soft); font-size:11px; cursor:default;}
+  .dept-leaders .pav{--sz:32px;} .pav-stack{display:inline-flex; align-items:center;} .pav-stack .pav + .pav{margin-left:-8px;}
   .dept-leaders{display:inline-flex; align-items:center; gap:8px; font-size:12.5px; color:var(--slate); cursor:pointer;}
   .dept-leaders b{color:var(--ink-soft); font-weight:600;}
   .pp-back{position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:200; display:none; align-items:center; justify-content:center; padding:16px;}
@@ -542,6 +552,110 @@
     h1{font-size:21px;}
     .theme-pop{right:auto; left:0;}
   }
+
+  /* =====================================================================
+     เต็มหน้าจอ + กระชับ + รองรับสมาร์ตโฟน + Full Color (ต่อท้าย — แทนค่าเดิม)
+     ===================================================================== */
+  :root{ --pad:clamp(12px, 2.2vw, 40px); }
+  html, body{ overflow-x:hidden; }
+  .top-inner, .pill-bar-inner, .overview, main, .impact-inner{ max-width:none; padding-left:var(--pad); padding-right:var(--pad); }
+  header.top{
+    background:
+      radial-gradient(60% 120% at 100% 0%, color-mix(in srgb, var(--dept-a) 16%, transparent) 0%, transparent 60%),
+      radial-gradient(45% 110% at 0% 100%, color-mix(in srgb, var(--dept-c) 13%, transparent) 0%, transparent 60%),
+      radial-gradient(40% 90% at 55% 0%, color-mix(in srgb, var(--dept-b) 12%, transparent) 0%, transparent 60%),
+      var(--paper);
+  }
+  .top-inner{ padding-top:14px; padding-bottom:12px; }
+  .top-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .brand{ min-width:0; flex:1; }
+  h1{ font-size:clamp(19px, 1.7vw, 25px); margin:2px 0 2px; line-height:1.3;
+      background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  :root[data-theme="night"] h1{ color:var(--ink); }
+  .subtitle{ font-size:13.5px; max-width:none; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .toolbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  .toolbar .view-tabs{ margin:0; }
+  .toolbar .view-tabs + .view-tabs{ margin:0; }
+  .toolbar .view-btn{ padding:7px 14px; font-size:13px; }
+  .toolbar .search-wrap{ flex:1 1 220px; max-width:440px; min-width:180px; }
+  .toolbar .sync-row{ margin:0 0 0 auto; }
+  .sync-btn{ padding:7px 13px; }
+  .overview{ display:grid; grid-template-columns:minmax(260px, 380px) minmax(0, 1fr); gap:12px; margin-top:14px; align-items:stretch; }
+  .overview .kpi-row{ gap:10px; }
+  .overview .status-breakdown{ margin-top:0; }
+  .kpi{ padding:12px 16px; border-top:3px solid transparent; border-image:var(--grad) 1; border-image-slice:1; border-left:0; border-right:0; border-bottom:0; }
+  .kpi .num{ font-size:26px; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .kpi .label{ margin-top:4px; font-size:12px; }
+  .status-breakdown{ padding:12px 16px; }
+  .sb-title{ margin-bottom:8px; }
+  .sb-legend{ gap:6px 16px; margin-top:9px; } .sb-legend.sb-outcome{ margin-top:8px; padding-top:8px; }
+  main{ padding-top:20px; }
+  .card-grid{ grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); }
+  .task-card{ position:relative; }
+  .dept-section .dept-head h2{ background:none; }
+  .dept-head{ border-bottom:2px solid color-mix(in srgb, var(--dept-head-c, var(--dept-a)) 30%, transparent); }
+  .pav{ background:var(--grad); }
+  .pp .ph{ background:var(--grad); }
+  .pp a{ color:var(--dept-a); }
+  .pill-row{ scrollbar-width:none; } .pill-row::-webkit-scrollbar{ display:none; }
+
+  /* ---------- แจ้งเตือนเรื่องใหม่ / อัปเดต (เรียลไทม์) ---------- */
+  .live-stack{ position:fixed; right:18px; bottom:18px; z-index:150; display:flex; flex-direction:column; gap:10px; width:min(380px, calc(100vw - 24px)); pointer-events:none; }
+  .live-note{ pointer-events:auto; background:var(--card); color:var(--ink); border-radius:16px; padding:12px 14px 12px 16px; position:relative; overflow:hidden;
+    box-shadow:0 20px 50px -20px rgba(15,23,42,.45); border:1px solid var(--line); animation:noteIn .35s cubic-bezier(.2,.8,.2,1); }
+  .live-note::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--grad); }
+  .live-note .h{ font-family:'Kanit',sans-serif; font-weight:600; font-size:13.5px; display:flex; align-items:center; gap:6px; }
+  .live-note .t{ font-size:13.5px; margin-top:3px; line-height:1.45; overflow-wrap:anywhere; }
+  .live-note .s{ font-size:12px; color:var(--slate); margin-top:2px; }
+  .live-note .acts{ display:flex; gap:8px; margin-top:8px; }
+  .live-note button{ border:0; border-radius:9px; padding:6px 12px; font-family:inherit; font-weight:600; font-size:12.5px; cursor:pointer; }
+  .live-note .go{ background:var(--grad); color:#fff; } .live-note .x{ background:var(--line-soft); color:var(--ink-soft); }
+  @keyframes noteIn{ from{ opacity:0; transform:translateY(16px) scale(.98); } to{ opacity:1; transform:none; } }
+  .live-badge{ position:absolute; top:-9px; left:14px; z-index:2; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700; color:#fff; letter-spacing:.02em;
+    box-shadow:0 6px 14px -6px rgba(0,0,0,.4); }
+  .live-badge.new{ background:linear-gradient(120deg,#F97316,#E11D74); } .live-badge.upd{ background:linear-gradient(120deg,#0EA5E9,#10B981); }
+  .task-card.is-fresh{ animation:freshGlow 2.4s ease-out 1; }
+  @keyframes freshGlow{ 0%{ box-shadow:0 0 0 4px color-mix(in srgb, var(--dept-c) 55%, transparent); } 100%{ box-shadow:var(--shadow); } }
+
+  /* ---------- แท็บเล็ต ---------- */
+  @media (max-width:1100px){
+    .overview{ grid-template-columns:minmax(0, 1fr); }
+  }
+  /* ---------- สมาร์ตโฟน ---------- */
+  @media (max-width:700px){
+    .top-inner{ padding-top:10px; padding-bottom:10px; }
+    .top-row{ gap:8px; }
+    .eyebrow{ font-size:10px; }
+    h1{ font-size:18px; }
+    .subtitle{ font-size:12.5px; -webkit-line-clamp:2; }
+    .top-actions{ gap:6px; flex-shrink:0; }
+    .top-actions .lbl{ display:none; }
+    .top-actions a, .top-actions button{ padding:7px 9px !important; }
+    .toolbar{ gap:8px; margin-top:10px; }
+    .toolbar .view-tabs{ width:100%; max-width:100%; overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; }
+    .toolbar .view-tabs::-webkit-scrollbar{ display:none; }
+    .toolbar .view-btn{ flex:1 0 auto; justify-content:center; padding:7px 10px; font-size:12.5px; white-space:nowrap; }
+    .toolbar .search-wrap{ flex:1 1 100%; max-width:none; min-width:0; }
+    .toolbar .sync-row{ margin:0; width:100%; justify-content:space-between; flex-wrap:nowrap; }
+    .sync-btn .lbl{ display:none; } .sync-btn{ padding:8px 11px; }
+    .conn-line{ font-size:10px; min-width:0; overflow:hidden; }
+    .conn-line span:last-child{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .overview{ margin-top:10px; gap:8px; }
+    .kpi-row{ grid-template-columns:repeat(2, minmax(0, 1fr)) !important; }
+    .kpi{ padding:10px 12px; } .kpi .num{ font-size:22px; }
+    .status-breakdown{ padding:10px 12px; } .sb-item{ font-size:11.5px; }
+    .pill-bar-inner{ padding-top:8px; padding-bottom:8px; }
+    .pill-row{ flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    .pill{ padding:6px 12px; font-size:12.5px; }
+    main{ padding-top:14px; }
+    .card-grid{ grid-template-columns:minmax(0, 1fr); gap:12px; }
+    .dept-head{ flex-wrap:wrap; row-gap:6px; }
+    .dept-head h2{ font-size:15px; flex:1 1 calc(100% - 24px); min-width:0; }
+    .task-card{ padding:13px 14px; }
+    .impact-grid{ grid-template-columns:minmax(0, 1fr) !important; }
+    .live-stack{ right:12px; left:12px; bottom:12px; width:auto; }
+    .pp{ padding:18px; } .pp .ph{ width:120px; height:120px; }
+  }
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{transition:none !important; animation:none !important;}
   }
@@ -552,47 +666,41 @@
 <header class="top">
   <div class="top-inner">
     <div class="top-row">
-      <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
+      <div class="brand">
+        <div class="eyebrow">คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหาสารคาม</div>
+        <h1 id="siteTitle">แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
+        <div class="subtitle" id="siteSubtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
+      </div>
       <div class="top-actions">
       <a class="home-link" href="https://eng.msu.ac.th" title="ไปที่เว็บไซต์คณะวิศวกรรมศาสตร์ eng.msu.ac.th">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>
-        หน้าหลัก
-      </a>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg><span class="lbl">หน้าหลัก</span>      </a>
       <button class="theme-btn" id="themeBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="themePop">
-        <span class="swatch-now"></span> ธีมสี
+        <span class="swatch-now"></span><span class="lbl">ธีมสี</span>
       </button>
       <div class="theme-pop" id="themePop" role="radiogroup" aria-label="เลือกธีมสี">
         <div class="theme-pop-title">เลือกธีมสีของแดชบอร์ด (จำไว้ในเบราว์เซอร์นี้)</div>
         <div class="theme-grid" id="themeGrid"></div>
       </div>
       <a class="admin-login-link" href="https://script.google.com/a/macros/msu.ac.th/s/AKfycbwi5SxQs9LLkRlcgaVvZGQa0tW9h7drOLN5dBVp754j6Peg9xqweTme51Xhpij9dGDm/exec" target="_blank" rel="noopener">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        เข้าสู่ระบบผู้ดูแล
-      </a>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span class="lbl">เข้าสู่ระบบผู้ดูแล</span>      </a>
       </div>
     </div>
-    <h1 id="siteTitle">แดชบอร์ดติดตามงานประชุมกำกับติดตามฯ</h1>
-    <div class="subtitle" id="siteSubtitle">สรุปความคืบหน้างานสืบเนื่องจากการประชุมกำกับติดตามงานของคณบดี ปีงบประมาณ 2568–2569 แยกตามฝ่ายงานหลัก พร้อมสถานะล่าสุดของแต่ละเรื่อง</div>
-
-    <div class="sync-row">
-      <button class="sync-btn" id="syncBtn" type="button">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        ซิงก์ข้อมูลล่าสุด
-      </button>
-      <div class="conn-line" id="connLine"><span class="conn-dot"></span><span>ยังไม่เชื่อมต่อ</span></div>
-    </div>
-
-    <div class="view-tabs" id="yearTabs"></div>
-    <div class="view-tabs" id="viewTabs"></div>
-
-    <div class="controls">
+    <div class="toolbar">
+      <div class="view-tabs" id="yearTabs"></div>
+      <div class="view-tabs" id="viewTabs"></div>
       <div class="search-wrap">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" type="text" placeholder="ค้นหาเรื่อง / ผู้รับผิดชอบ...">
       </div>
+      <div class="sync-row">
+        <button class="sync-btn" id="syncBtn" type="button">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span class="lbl">ซิงก์ข้อมูลล่าสุด</span>      </button>
+        <div class="conn-line" id="connLine"><span class="conn-dot"></span><span>ยังไม่เชื่อมต่อ</span></div>
+      </div>
     </div>
   </div>
 </header>
+<div class="live-stack" id="liveStack" aria-live="polite"></div>
 
 <section class="overview" id="overview"></section>
 
@@ -628,7 +736,7 @@
     tracking:  { key:'tracking',  label:'งานติดตาม',       icon:'📋', id:'1x_iWZ-wTP71i4m6EpHQPyrUyaSiSCCefT4aDKMaY4_M', gid:1843765478, defaultStatus:null },
     completed: { key:'completed', label:'งานที่แล้วเสร็จ', icon:'✅', id:'1x_iWZ-wTP71i4m6EpHQPyrUyaSiSCCefT4aDKMaY4_M', gid:552119194,  defaultStatus:'สำเร็จ' }
   };
-  const DEPT_COLORS = ['var(--dept-a)','var(--dept-b)','var(--dept-c)','var(--dept-d)'];
+  const DEPT_COLORS = ['var(--dept-a)','var(--dept-b)','var(--dept-c)','var(--dept-d)','var(--dept-e, var(--dept-a))','var(--dept-f, var(--dept-c))'];
 
   // ---------- Thai fiscal year helpers ----------
   // Thai fiscal year (พ.ศ.) N runs 1 Oct (N-1, converted to CE) through 30 Sep (N, converted
@@ -970,14 +1078,15 @@
 
   // ---------- Theme picker ----------
   const THEMES = [
+    { key:'spectrum',name:'สเปกตรัม',  grad:'linear-gradient(110deg,#1D4ED8,#0891B2,#10B981,#F59E0B)' },
     { key:'sky',     name:'ฟ้าคราม',   grad:'linear-gradient(120deg,#0E4B72,#1D6FB5,#38A8DA)' },
     { key:'maroon',  name:'เลือดหมู',   grad:'linear-gradient(120deg,#5E1022,#A3243B,#E0655A)' },
     { key:'emerald', name:'มรกต',      grad:'linear-gradient(120deg,#0B4F4A,#0F8A7E,#3CCB9F)' },
     { key:'indigo',  name:'อินดิโก',    grad:'linear-gradient(120deg,#312E81,#5B3FE0,#C026D3)' },
     { key:'gold',    name:'เทา–ทอง',   grad:'linear-gradient(120deg,#45443F,#8A6A12,#E2B53A)' },
-    { key:'night',   name:'กลางคืน',   grad:'linear-gradient(120deg,#0D1522 35%,#2563EB 70%,#06B6D4)' }
+    { key:'night',   name:'กลางคืน',   grad:'linear-gradient(120deg,#0D1522 35%,#2563EB 70%,#14B8A6)' }
   ];
-  function currentTheme(){ return document.documentElement.getAttribute('data-theme') || 'sky'; }
+  function currentTheme(){ return document.documentElement.getAttribute('data-theme') || 'spectrum'; }
   function applyTheme(key){
     document.documentElement.setAttribute('data-theme', key);
     try{ localStorage.setItem('deanTrackingTheme', key); }catch(e){}
@@ -1294,13 +1403,14 @@
     if(item.doneDate) extraFields.push(`<div><b>วันที่งานสำเร็จ:</b> ${escapeHtml(item.doneDate)}</div>`);
 
     return `
-    <div class="task-card ${isOverdue ? 'overdue' : ''}" style="--dept-color:${color}">
+    <div class="task-card ${isOverdue ? 'overdue' : ''} ${LIVE_NEW.has(liveKey(currentView, item)) || LIVE_UPD.has(liveKey(currentView, item)) ? 'is-fresh' : ''}" data-key="${escapeHtml(liveKey(currentView, item))}" style="--dept-color:${color}">
+      ${LIVE_NEW.has(liveKey(currentView, item)) ? '<span class="live-badge new">ใหม่</span>' : (LIVE_UPD.has(liveKey(currentView, item)) ? '<span class="live-badge upd">อัปเดต</span>' : '')}
       ${opts.showDeptTag ? `<div class="card-dept-tag" style="color:${color}"><span class="dept-dot" style="background:${color}"></span>${escapeHtml(shortName(opts.deptName || ''))}</div>` : ''}
       <div class="task-top">
         <div>
           <div class="task-no">${item.no ? '#'+escapeHtml(item.no) : ''}</div>
           <div class="task-title">${escapeHtml(item.title)}</div>
-          ${isCarried(item) ? `<div style="display:inline-block;margin-top:4px;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;background:#F1ECFF;color:#6D28D9">ยกมาจากปีงบประมาณ ${escapeHtml(itemFY(item))}</div>` : ''}
+          ${isCarried(item) ? `<div style="display:inline-block;margin-top:4px;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;background:color-mix(in srgb, var(--dept-b) 14%, var(--card));color:var(--dept-b)">ยกมาจากปีงบประมาณ ${escapeHtml(itemFY(item))}</div>` : ''}
           ${!itemFY(item) ? `<div style="display:inline-block;margin-top:4px;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;background:#EEF0F4;color:#64748B">ไม่ระบุวันที่เริ่ม</div>` : ''}
         </div>
         <div class="tag-stack">
@@ -1391,7 +1501,7 @@
       const kpi = deptKPI(d);
       html += `
       <div class="dept-section">
-        <div class="dept-head">
+        <div class="dept-head" style="--dept-head-c:${color}">
           <span class="dept-dot" style="background:${color}"></span>
           <h2>${escapeHtml(d.name.trim())}</h2>
           ${leadersHtml(d.name)}
@@ -1606,10 +1716,12 @@
     const key = escapeHtml(p.email || p.fullName || p.name);
     return `<span class="pav ${cls || ''}" data-person="${key}" title="${escapeHtml(p.fullName || p.name)}">${escapeHtml(initial(p))}${p.photo ? `<img src="${escapeHtml(p.photo)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : ''}</span>`;
   }
+  // หัวฝ่ายงาน: แสดงเฉพาะรูป (ไม่แสดงชื่อ เพื่อไม่กินพื้นที่) — ชี้ที่รูปเห็นชื่อ คลิกเปิดข้อมูลของคนนั้น
   function leadersHtml(deptName){
-    const L = deptLeaders(deptName).slice(0, 3);
+    const all = deptLeaders(deptName), L = all.slice(0, 5);
     if(!L.length) return '';
-    return `<span class="dept-leaders" data-person="${escapeHtml(L[0].email || L[0].fullName)}"><span class="pav-stack">${L.map(p => pavHtml(p)).join('')}</span><span><b>${escapeHtml(L[0].fullName)}</b>${L.length > 1 ? ' และอีก ' + (L.length - 1) + ' ท่าน' : ''}</span></span>`;
+    const more = all.length - L.length;
+    return `<span class="dept-leaders" title="ผู้รับผิดชอบ ${all.length} ท่าน — คลิกที่รูปเพื่อดูข้อมูล"><span class="pav-stack">${L.map(p => pavHtml(p)).join('')}${more > 0 ? `<span class="pav more" title="${escapeHtml(all.slice(5).map(p => p.fullName).join(', '))}">+${more}</span>` : ''}</span></span>`;
   }
   function openPerson(key){
     const p = PEOPLE.find(x => (x.email && x.email === key) || x.fullName === key || x.name === key);
@@ -1648,6 +1760,63 @@
   function flashUpdated(){
     const el = document.getElementById('connLine');
     if(el){ el.classList.remove('live-flash'); void el.offsetWidth; el.classList.add('live-flash'); }
+  }
+
+  // ---------- แจ้งเตือนเรื่องใหม่ / อัปเดตสถานะ แบบทันที ----------
+  // - ระหว่างเปิดหน้าอยู่: มีเรื่องใหม่หรือสถานะเปลี่ยน -> การ์ดแจ้งเตือน + ป้าย "ใหม่"/"อัปเดต" บนการ์ด
+  // - เปิดหน้าใหม่: เรื่องที่เพิ่มเข้ามาตั้งแต่ครั้งก่อนที่เปิดดู ได้ป้าย "ใหม่" (จำไว้ในเบราว์เซอร์นี้)
+  const LIVE_NEW = new Set(), LIVE_UPD = new Set();
+  const SEEN_KEY = 'deanTrackingSeen';
+  let hiddenNews = 0; const baseTitle = document.title;
+  function liveKey(view, it){ return view + '|' + (it.no || '') + '|' + String(it.title || '').trim(); }
+  function flatItems(ds){ const out = []; (ds && ds.departments || []).forEach(d => d.items.forEach(it => out.push({ it, dept: d.name }))); return out; }
+  function detectLiveChanges(v, before, after, prevState){
+    const now = flatItems(after);
+    let seen = {}; try{ seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); }catch(e){}
+    if(!prevState || !prevState.fresh){
+      // ข้อมูลจริงชุดแรกของการเปิดหน้านี้: เทียบกับรายการที่เคยเห็นครั้งก่อน
+      if(Array.isArray(seen[v.key])){
+        const old = new Set(seen[v.key]);
+        const news = now.filter(x => !old.has(liveKey(v.key, x.it)));
+        news.forEach(x => LIVE_NEW.add(liveKey(v.key, x.it)));
+        if(news.length) notify('🆕 มีเรื่องใหม่ ' + news.length + ' เรื่อง', 'ใน' + v.label + ' ตั้งแต่ครั้งก่อนที่เปิดดู', news.length === 1 ? news[0].it.title : '', news[0] && { view: v.key, it: news[0].it });
+      }
+    } else if(before){
+      const prev = new Map(flatItems(before).map(x => [liveKey(v.key, x.it), x.it]));
+      const added = now.filter(x => !prev.has(liveKey(v.key, x.it)));
+      const changed = now.filter(x => { const o = prev.get(liveKey(v.key, x.it)); return o && (o.status || '') !== (x.it.status || ''); });
+      added.forEach(x => LIVE_NEW.add(liveKey(v.key, x.it)));
+      changed.forEach(x => LIVE_UPD.add(liveKey(v.key, x.it)));
+      added.slice(0, 3).forEach(x => notify('🆕 เรื่องใหม่ · ' + v.label, x.it.title, shortName(x.dept || ''), { view: v.key, it: x.it }));
+      if(added.length > 3) notify('🆕 และเรื่องใหม่อีก ' + (added.length - 3) + ' เรื่อง', 'ใน' + v.label, '', null);
+      changed.slice(0, 3).forEach(x => { const o = prev.get(liveKey(v.key, x.it)); notify('🔄 อัปเดตสถานะ · ' + v.label, x.it.title, (o.status || 'ยังไม่มีรายงาน') + ' → ' + (x.it.status || 'ยังไม่มีรายงาน'), { view: v.key, it: x.it }); });
+      if(document.hidden && (added.length || changed.length)){ hiddenNews += added.length + changed.length; document.title = '(' + hiddenNews + ') ' + baseTitle; }
+    }
+    seen[v.key] = now.map(x => liveKey(v.key, x.it));
+    try{ localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); }catch(e){}
+  }
+  document.addEventListener('visibilitychange', () => { if(!document.hidden && hiddenNews){ hiddenNews = 0; document.title = baseTitle; } });
+  function notify(head, text, sub, target){
+    const box = document.getElementById('liveStack');
+    if(!box) return;
+    const el = document.createElement('div'); el.className = 'live-note';
+    el.innerHTML = `<div class="h">${escapeHtml(head)}</div>${text ? `<div class="t">${escapeHtml(text)}</div>` : ''}${sub ? `<div class="s">${escapeHtml(sub)}</div>` : ''}
+      <div class="acts">${target ? '<button type="button" class="go">ดูเรื่องนี้</button>' : ''}<button type="button" class="x">ปิด</button></div>`;
+    el.querySelector('.x').onclick = () => el.remove();
+    if(target) el.querySelector('.go').onclick = () => { el.remove(); goToItem(target.view, target.it); };
+    box.prepend(el);
+    while(box.children.length > 4) box.lastChild.remove();
+    setTimeout(() => el.remove(), 14000);
+  }
+  function goToItem(view, it){
+    if(currentView !== view){ const b = document.querySelector('[data-view="' + view + '"]'); if(b) b.click(); }
+    const fy = itemFY(it);
+    if(fy && fy !== activeYear){ const yb = document.querySelector('#yearTabs [data-year="' + fy + '"]'); if(yb) yb.click(); }
+    const all = document.querySelector('#deptPills .pill'); if(all && !all.classList.contains('active')) all.click();
+    setTimeout(() => {
+      const card = document.querySelector('.task-card[data-key="' + CSS.escape(liveKey(view, it)) + '"]');
+      if(card){ card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.remove('is-fresh'); void card.offsetWidth; card.classList.add('is-fresh'); }
+    }, 120);
   }
 
   // ---------- ความสดของข้อมูล ----------
@@ -1691,6 +1860,7 @@
         // ชีทว่าง (ไม่มีเรื่องเหลือ เช่น ทุกเรื่องสำเร็จและย้ายไปงานที่แล้วเสร็จแล้ว) = ข้อมูลที่ถูกต้อง ไม่ใช่ข้อผิดพลาด
         const fresh = csvText.trim() === '' ? { timeline_labels: [], departments: [] }
                                            : buildDataFromRows(parseCSV(csvText), {defaultStatus: v.defaultStatus});
+        detectLiveChanges(v, DATASETS[v.key], fresh, viewState[v.key]);
         DATASETS[v.key] = fresh;
         viewState[v.key] = { fresh: true, at: new Date(), error: '' };
         anySuccess = true;
@@ -1737,7 +1907,7 @@
   syncLive(false);
   loadPeople().then(ok => { if(ok) renderAll(); });
   checkMeta();
-  setInterval(() => { if(!document.hidden) checkMeta(); }, 15000);   // ตรวจการเปลี่ยนแปลงแบบเบาทุก 15 วินาที
+  setInterval(() => { if(!document.hidden) checkMeta(); }, 10000);   // ตรวจการเปลี่ยนแปลงแบบเบาทุก 10 วินาที
   // อัปเดตอัตโนมัติ: ทุก 2 นาทีเมื่อเปิดหน้าอยู่ และทันทีที่กลับมาที่แท็บนี้
   let lastAutoSync = Date.now();
   setInterval(() => { if(!document.hidden){ lastAutoSync = Date.now(); syncLive(false); } }, 120000);
